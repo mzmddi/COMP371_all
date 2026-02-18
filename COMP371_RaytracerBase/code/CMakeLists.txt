@@ -35,11 +35,24 @@ set(CMAKE_PREFIX_PATH
 if (WIN32)
 include_directories(C:/eigen-3.4.1/)# for windows you can directly hardcode the paths to your libraries in the include
 else() 
+# Code added by me
+# cause error cause i dont have eigen and it's trying to pull from the school server
+# this added code is to specify the path of eigen for my macbook m2
+# the code is if statement based, hopefully this works intergrated with the entire code
+if(APPLE)
+set(Eigen3_DIR /opt/homebrew/share/eigen3/cmake)
+else()
+# added code by me ends here
 set(ENV{EIGEN3_ROOT} /encs/pkg/eigen-3.3.7/root)
 set(CMAKE_MODULE_PATH /encs/pkg/eigen-3.3.7/root/cmake)
+endif()
+# the above line is also added by me to complete the if else block
 
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+# include_directories(${EIGEN3_INCLUDE_DIR})
+# added code below until the endif()
+include_directories(${EIGEN3_INCLUDE_DIRS})
+link_libraries(Eigen3::Eigen)
 endif()
 # If you need too manually add the paths to your Eigen library, you can add it here
 # do not delete the other 
