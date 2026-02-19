@@ -1,17 +1,18 @@
 // ---NOTES---
 
 // ---INCLUDE---
-#include "shapes.h";
-
+#include "shapes.h"
+#include "json.hpp"
+#include <iostream>
+#include <string>
 using namespace std;
 
 // ---CODE----
 
 // Sphere methods
 
-sphere::sphere(string type, Vector3f center, float radius) : type_(type), center_(center), radius_(radius) {};
-sphere::getType() const override{return type_};
-sphere::extractInformation(const nlohmann::json &j) override
+string sphere::getType() { return type_; };
+void sphere::extractInformation(const nlohmann::json &j)
 {
     if (j.contains("type") && j.contains("radius") && j.contains("center") && j.contains("ka") && j.contains("kd") && j.contains("ks") && j.contains("pc") && j.contains("ac") && j.contains("dc") && j.contains("sc"))
     {
@@ -22,9 +23,9 @@ sphere::extractInformation(const nlohmann::json &j) override
         this->kd_ = j["kd"].get<float>();
         this->ks_ = j["ks"].get<float>();
         this->pc_ = j["pc"].get<float>();
-        this->ac_ << j["ac"][0] << j["ac"][1] << j["ac"][2];
-        this->dc_ << j["dc"][0] << j["dc"][1] << j["dc"][2];
-        this->sc_ << j["sc"][0] << j["sc"][1] << j["sc"][2];
+        this->ac_ << j["ac"][0], j["ac"][1], j["ac"][2];
+        this->dc_ << j["dc"][0], j["dc"][1], j["dc"][2];
+        this->sc_ << j["sc"][0], j["sc"][1], j["sc"][2];
 
         if (j.contains("transform"))
         {
@@ -32,20 +33,19 @@ sphere::extractInformation(const nlohmann::json &j) override
                 j["transform"][4], j["transform"][5], j["transform"][6], j["transform"][7],
                 j["transform"][8], j["transform"][9], j["transform"][10], j["transform"][11],
                 j["transform"][12], j["transform"][13], j["transform"][14], j["transform"][15];
-        }
+        };
     }
     else
     {
-        cout << "Sphere is missing some mandatory values." << endl;
-        exit(0)
-    }
+        std::cout << "Sphere is missing some mandatory values." << endl;
+        exit(0);
+    };
 };
 ;
 
 // Rectangle methods
-rectangle::rectangle() {};
-rectangle::getType() const override{return type_};
-rectangle::extractInformation(const nlohmann::json &j) override
+string rectangle::getType() { return type_; };
+void rectangle::extractInformation(const nlohmann::json &j)
 {
     if (j.contains("type") && j.contains("p1") && j.contains("p2") && j.contains("p3") && j.contains("p4") && j.contains("ka") && j.contains("kd") && j.contains("ks") && j.contains("pc") && j.contains("ac") && j.contains("dc") && j.contains("sc"))
     {
@@ -58,9 +58,9 @@ rectangle::extractInformation(const nlohmann::json &j) override
         this->kd_ = j["kd"].get<float>();
         this->ks_ = j["ks"].get<float>();
         this->pc_ = j["pc"].get<float>();
-        this->ac_ << j["ac"][0] << j["ac"][1] << j["ac"][2];
-        this->dc_ << j["dc"][0] << j["dc"][1] << j["dc"][2];
-        this->sc_ << j["sc"][0] << j["sc"][1] << j["sc"][2];
+        this->ac_ << j["ac"][0], j["ac"][1], j["ac"][2];
+        this->dc_ << j["dc"][0], j["dc"][1], j["dc"][2];
+        this->sc_ << j["sc"][0], j["sc"][1], j["sc"][2];
 
         if (j.contains("transform"))
         {
@@ -72,8 +72,7 @@ rectangle::extractInformation(const nlohmann::json &j) override
     }
     else
     {
-        cout << "Rectangle is missing some mandatory values." << endl;
-        exit(0)
-    }
+        std::cout << "Rectangle is missing some mandatory values." << endl;
+        exit(0);
+    };
 };
-

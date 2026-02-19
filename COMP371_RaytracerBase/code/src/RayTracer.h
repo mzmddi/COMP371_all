@@ -1,43 +1,45 @@
 // ---NOTES---
+/*
+ */
 
 // ---INCLUDE---
 #include "json.hpp"
+#include "shapes.h"
+#include "commons.h"
+
 #include <Eigen/Core>
+using Eigen::Vector3f;
 #include <Eigen/Geometry>
+
 #include <vector>
+using namespace std;
 
 // ---CODE---
 
+class RayTracer
+{
 
-class RayTracer{
-    public:
-        RayTracer(const nlohmann::json& j);
-        void run();
+    const nlohmann::json json_;
+    // provided by main.cpp
 
-    private:
-        std::string filename;
+    vector<shape *> shapes_;
+    camera *camera_;
+    vector<ray *> rays_;
+    // my objects holding all my data
 
-        // background color?
-        // camera point
-        // view direction? -w
-        // up direction? v
-        // perspective ?? orthogo or orthonormal ??
+public:
+    RayTracer(const nlohmann::json &input_j);
+    void run();
+    // these two methods are the only ones exposed, and since they are the only two used outside
+    // of the src directory, they are the only two exposed to the system
+    // basically lets consider these two as the APIs of my program, if we consider everything i do as a microprogram inside the bigger program
 
-        // need to make a way to store all the geometries vector<>?
-        //  need to define a plane class?
-        // need to define a ray class?
-        
+private:
+    void extract();
+    // read the json file using the nlohmann thing already provided
+    // class method, so same scope as everything in class raytracer, so no need to pass params
+    // It is working internally (of the raytracer class), so it won't need outside params injected in
+    // end goal -> populate the data structures we need with data from the json
 
-        // need to find a way to extract the data from the json first then do something with it
-
-        /*
-        quick brainstorm:
-        1) extract data from json object nlohmann??
-        2) input data into the sphere and rectangle class and store them somewhere
-        3) extract all the other data from the json that are not the shapes
-        4) if we assume we have a ray, implement the math in the methods of each shape for the intersection
-        5) structure everyone in the context of the run() method since thats where it is run
-        6) output file?
-        */
-
+    void test_coding();
 };
