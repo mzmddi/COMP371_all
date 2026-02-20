@@ -44,9 +44,9 @@ void RayTracer::extract()
     // check if the json contains output
     if (json_.contains("output"))
     {
-        camera_ = new camera();
+        output_ = new output();
         // need to change this to basic constructor
-        camera_->extractInformation(json_["output"]);
+        output_->extractInformation(json_["output"][0]);
     }
     else
     {
@@ -62,6 +62,10 @@ void RayTracer::test_coding()
     {
         cout << "Shape [" << i << "]: " << shapes_.at(i)->getType() << "\n";
     };
+    cout << "\noutput variable data: " << "\n";
+    cout << output_->filename_ << endl;
+    cout << output_->size_.at(1) << endl;
+    cout << output_->lookat_ << endl;
 };
 
 void RayTracer::run()

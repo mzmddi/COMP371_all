@@ -9,6 +9,8 @@ File used for small objects, "commons" lets say
 #include "Eigen/Core"
 using Eigen::Vector3f;
 #include "json.hpp"
+#include <vector>
+#include <string>
 
 // ---CODE---
 
@@ -19,14 +21,16 @@ public:
     ray() {}
 };
 
-class camera
+class output
 {
+public:
+    std::string filename_;
     float fov_;
     Vector3f lookat_;
     Vector3f up_;
-
-public:
-    camera() {}
+    std::vector<int> size_;
+    Vector3f centre_;
+    output() {}
     // constructor so i have the option of deciding later how to build the object
 
     float getFov();

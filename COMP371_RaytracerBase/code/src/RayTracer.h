@@ -23,7 +23,7 @@ class RayTracer
     // provided by main.cpp
 
     vector<shape *> shapes_;
-    camera *camera_;
+    output *output_;
     vector<ray *> rays_;
     // my objects holding all my data
 
