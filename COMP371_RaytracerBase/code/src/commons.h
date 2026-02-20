@@ -16,9 +16,12 @@ using Eigen::Vector3f;
 
 class ray
 {
-
 public:
-    ray() {}
+    Vector3f origin_;
+    Vector3f direction_;
+    // before passing to constructure of ray, must do direction.normalize()
+
+    ray(Vector3f origin, Vector3f direction) : origin_(origin), direction_(direction) {}
 };
 
 class output
@@ -27,9 +30,13 @@ public:
     std::string filename_;
     float fov_;
     Vector3f lookat_;
+    // where the camera is looking at
     Vector3f up_;
+    // world up direcriion
     std::vector<int> size_;
     Vector3f centre_;
+    // camera position
+    Vector3f bkc_;
     output() {}
     // constructor so i have the option of deciding later how to build the object
 
