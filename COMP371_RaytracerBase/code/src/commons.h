@@ -19,7 +19,6 @@ class ray
 public:
     Vector3f origin_;
     Vector3f direction_;
-    // before passing to constructure of ray, must do direction.normalize()
 
     ray(Vector3f origin, Vector3f direction) : origin_(origin), direction_(direction) {}
 };
@@ -38,12 +37,10 @@ public:
     // camera position
     Vector3f bkc_;
     output() {}
-    // constructor so i have the option of deciding later how to build the object
 
     float getFov();
     Vector3f getLookat();
     Vector3f getUp();
-    // getters, using const so that i dont accidentally change the value inside the camera
 
     void extractInformation(const nlohmann::json &j);
 };
