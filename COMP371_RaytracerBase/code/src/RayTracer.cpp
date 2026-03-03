@@ -6,6 +6,8 @@
 #include "RayTracer.h"
 #include <iostream>
 #include <string>
+#include "Eigen/Dense"
+#include "simpleppm.h"
 
 using namespace std;
 
@@ -100,7 +102,17 @@ void RayTracer::run()
     // create the vector of vectors that will store all our pixel values
     std::vector<Vector3f> buffer(width * height);
 
-    cout << "size of buffer: " << buffer.size() << std::endl;
+    Vector3f backgroundColor = output_->bkc_;
+    Vector3f objectColor;
+
+    if (backgroundColor.isZero())
+    {
+        objectColor = Vector3f(1.0f, 1.0f, 0.0f);
+    }
+    else
+    {
+        objectColor = Vector3f(0.0f, 0.0f, 0.0f);
+    };
 
     for (int j = 0; j < height; j++)
     {
@@ -123,8 +135,40 @@ void RayTracer::run()
 
             float closesthit = std::numeric_limits<float>::max();
             // we only care about the closest hit relative to the camera
+
+            for (auto s : shapes_)
+            {
+                if (s->intersect(o, d))
+                {
+                    hitormiss = true;
+                    break;
+                    // since this is the first ray tracing, im stopping here since we only need to know if it hits or not
+                }
+            };
+            int pixelPositionIndex = j * width + i;
+            if (hitormiss)
+            {
+                buffer[pixelPositionIndex] = objectColor;
+            }
+            else
+            {
+                buffer[pixelPositionIndex] = backgroundColor;
+            };
         };
     };
 
-    cout << "success" << endl;
+    std::vector<double> flatBuffer;
+    flatBuffer.reserve(width * height * 3);
+    // i need to change my vector<Vector3f> buffer to a flat one with doubles only...
+
+    for (const auto &v : buffer)
+    {
+        flatBuffer.push_back(static_cast<double>(v[0]));
+        flatBuffer.push_back(static_cast<double>(v[1]));
+        flatBuffer.push_back(static_cast<double>(v[2]));
+        // since the save_ppm file needs a flat vector, i need to push back each element in the Vector3f i created
+        // so the sequence in the flat buffer is just rgbrgbrgbrgb over and over again
+    }
+
+    save_ppm(output_->filename_, flatBuffer, width, height);
 };

@@ -1,9 +1,6 @@
 // ---NOTES---
 /*
-parent class shape
-children class circle and rectangle
-this way they can implement their own interset method, but we can call the same regardless of if it is a sphere or a rectangle
-*/
+ */
 
 // ---INCLUDES---
 #include <Eigen/Core>
@@ -42,6 +39,7 @@ protected:
 public:
     virtual string getType() = 0;
     virtual void extractInformation(const nlohmann::json &j) = 0;
+    virtual bool intersect(const Vector3f &o, const Vector3f &d) = 0;
 };
 
 class sphere : public shape
@@ -54,6 +52,7 @@ public:
     // all the other methods for this class
     string getType() override;
     void extractInformation(const nlohmann::json &j) override;
+    bool intersect(const Vector3f &o, const Vector3f &d) override;
 };
 
 class rectangle : public shape
@@ -69,4 +68,5 @@ public:
     // in the assignmemnt, it says assume all points are coplanar
     string getType() override;
     void extractInformation(const nlohmann::json &j) override;
+    bool intersect(const Vector3f &o, const Vector3f &d) override;
 };

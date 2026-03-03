@@ -5,6 +5,7 @@
 #include "json.hpp"
 #include <iostream>
 #include <string>
+#include <Eigen/Dense>
 using namespace std;
 
 // ---CODE----
@@ -42,7 +43,29 @@ void sphere::extractInformation(const nlohmann::json &j)
     };
 };
 ;
+bool sphere::intersect(const Vector3f &o, const Vector3f &d)
+{
+    Vector3f oc = o - this->center_;
+    float a = d.dot(d);
+    float b = 2.0f * oc.dot(d);
+    float c = oc.dot(oc) - (this->radius_ * this->radius_);
+    float underthesquare = b * b - 4 * c;
+    // we set up our quadratic equation and we find the part thats under the square
 
+    if (underthesquare < 0)
+    {
+        // if under the square is negative, it's imaginary # and we dont work with that
+        return false;
+    };
+    float sqr = sqrt(underthesquare);
+    float first_t = (-b - sqr) / 2.0f / a;
+    float second_t = (-b + sqr) / 2.0f / a;
+    // calculating the value under the root
+
+    float small_t = std::min(first_t, second_t);
+    float big_t = std::max(first_t, second_t);
+    return true;
+};
 // Rectangle methods
 string rectangle::getType() { return type_; };
 void rectangle::extractInformation(const nlohmann::json &j)
@@ -74,5 +97,45 @@ void rectangle::extractInformation(const nlohmann::json &j)
     {
         std::cout << "Rectangle is missing some mandatory values." << endl;
         exit(0);
+    };
+};
+bool rectangle::intersect(const Vector3f &o, const Vector3f &d)
+{
+    Vector3f e1 = this->p2_ - this->p1_;
+    Vector3f e2 = this->p3_ - this->p1_;
+    Vector3f n_rec = e1.cross(e2).normalized();
+
+    float deno = n_rec.dot(d);
+    // check if the ray is paralelle to the plane or close to paralelle
+
+    if (deno < 1e-5)
+    {
+        return false;
+    };
+    float t = -n_rec.dot(o) / deno;
+
+    if (t < 0.00001f)
+    {
+        return false;
+    };
+    // if its behind the camera
+
+    Vector3f hp = o + t * d;
+    // finding the hit point
+
+    float q1 = (this->p2_ - this->p1_).cross(hp - this->p1_).dot(n_rec);
+    float q2 = (this->p3_ - this->p2_).cross(hp - this->p2_).dot(n_rec);
+    float q3 = (this->p4_ - this->p3_).cross(hp - this->p3_).dot(n_rec);
+    float q4 = (this->p1_ - this->p4_).cross(hp - this->p4_).dot(n_rec);
+    // we calculate everything we need for determining if its inside the rectangle or outside of it
+
+    if (q1 * q2 >= 0 && q2 * q3 > 0 && q1 * q4 > 0 && q2 * q4 > 0)
+    // the logic here is that if all of them are either all negative or postive, they will all product a positive product
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     };
 };
