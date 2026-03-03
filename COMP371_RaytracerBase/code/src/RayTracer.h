@@ -21,12 +21,19 @@ class RayTracer
 {
 
     const nlohmann::json json_;
-    // provided by main.cpp
-
     vector<shape *> shapes_;
-    output *output_;
+    // output *output_;
     vector<ray *> rays_;
-    // my objects holding all my data
+    std::string filename_;
+    float fov_;
+    Vector3f lookat_;
+    Vector3f up_;
+    std::vector<int> size_;
+    Vector3f centre_;
+    Vector3f bkc_;
+    float getFov();
+    Vector3f getLookat();
+    Vector3f getUp();
 
 public:
     RayTracer(const nlohmann::json &input_j);

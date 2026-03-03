@@ -23,24 +23,24 @@ public:
     ray(Vector3f origin, Vector3f direction) : origin_(origin), direction_(direction) {}
 };
 
-class output
-{
-public:
-    std::string filename_;
-    float fov_;
-    Vector3f lookat_;
-    // where the camera is looking at
-    Vector3f up_;
-    // world up direcriion
-    std::vector<int> size_;
-    Vector3f centre_;
-    // camera position
-    Vector3f bkc_;
-    output() {}
+// class output
+// {
+// public:
+//     std::string filename_;
+//     float fov_;
+//     Vector3f lookat_;
+//     // where the camera is looking at
+//     Vector3f up_;
+//     // world up direcriion
+//     std::vector<int> size_;
+//     Vector3f centre_;
+//     // camera position
+//     Vector3f bkc_;
+//     output() {}
 
-    float getFov();
-    Vector3f getLookat();
-    Vector3f getUp();
+//     float getFov();
+//     Vector3f getLookat();
+//     Vector3f getUp();
 
-    void extractInformation(const nlohmann::json &j);
-};
+//     void extractInformation(const nlohmann::json &j);
+// };

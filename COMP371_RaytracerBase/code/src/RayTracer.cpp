@@ -46,9 +46,17 @@ void RayTracer::extract()
     // check if the json contains output
     if (json_.contains("output"))
     {
-        output_ = new output();
+        // output_ = new output();
         // need to change this to basic constructor
-        output_->extractInformation(json_["output"][0]);
+        //output_->extractInformation(json_["output"][0]);
+        this->size_.push_back(json_["output"][0]["size"].at(0).get<int>());
+        this->size_.push_back(json_["output"][0]["size"].at(1).get<int>());
+        this->lookat_ << json_["output"][0]["lookat"].at(0).get<float>(), json_["output"][0]["lookat"].at(1).get<float>(), json_["output"][0]["lookat"].at(2).get<float>();
+        this->up_ << json_["output"][0]["up"].at(0).get<float>(), json_["output"][0]["up"].at(1).get<float>(), json_["output"][0]["up"].at(2).get<float>();
+        this->filename_ = json_["output"][0]["filename"];
+        this->centre_ << json_["output"][0]["centre"].at(0).get<float>(), json_["output"][0]["centre"].at(1).get<float>(), json_["output"][0]["centre"].at(2).get<float>();
+        this->bkc_ << json_["output"][0]["bkc"].at(0).get<float>(), json_["output"][0]["bkc"].at(1).get<float>(), json_["output"][0]["bkc"].at(2).get<float>();
+        this->fov_ = json_["output"][0]["fov"];
     }
     else
     {
@@ -59,16 +67,11 @@ void RayTracer::extract()
 
 void RayTracer::test_coding()
 {
-    cout << "\nSize of the shapes vector: " << shapes_.size() << "\n";
-    for (int i = 0; i < shapes_.size() - 1; i++)
-    {
-        cout << "Shape [" << i << "]: " << shapes_.at(i)->getType() << "\n";
-    };
-    cout << "\noutput variable data: " << "\n";
-    cout << output_->filename_ << endl;
-    cout << output_->size_.at(1) << endl;
-    cout << output_->lookat_ << endl;
-    cout << output_->bkc_[0] << " " << output_->bkc_[1] << " " << output_->bkc_[2] << std::endl;
+    cout << "size of shape vector: " << this->shapes_.size() << endl;
+    cout << "output filename: " << this->filename_ << endl;
+    cout << "window size: " << this->size_[0] << " " << this->size_[1] << endl;
+    cout << "lookat vector: "<<this->lookat_[0] << " " << this->lookat_[1] << " " << this->lookat_[2] << endl;
+    cout << "background color: "<< this->bkc_[0] << " " << this->bkc_[1] << " " << this->bkc_[2] << std::endl;
 };
 
 void RayTracer::run()
@@ -79,30 +82,27 @@ void RayTracer::run()
     extract();
     test_coding();
 
-    Vector3f w = (output_->centre_ - output_->lookat_).normalized();
+    Vector3f w = (this->centre_ - this->lookat_).normalized();
     // one of the basis vectors the w
 
-    Vector3f u = output_->up_.cross(w).normalized();
+    Vector3f u = this->up_.cross(w).normalized();
     // the u basis vector which points to the right of the camera
 
     Vector3f v = w.cross(u);
     // the v basis vector which is up (very up)
 
-    float width = (float)output_->size_[0];
-    float height = (float)output_->size_[1];
-    cout << "Testing new values w h fov:  " << width << " " << height << " " << output_->fov_ << std::endl;
+    float width = (float)this->size_[0];
+    float height = (float)this->size_[1];
 
-    float theta = output_->fov_ * (EIGEN_PI / 180.0f);
+    float theta = this->fov_ * (EIGEN_PI / 180.0f);
     float halfHeight = tan(theta / 2.0f);
     float aspectRatio = width / height;
     float halfWidth = aspectRatio * halfHeight;
 
-    cout << "Testing new values in order: " << theta << " " << halfHeight << " " << aspectRatio << " " << halfWidth << std::endl;
-
     // create the vector of vectors that will store all our pixel values
     std::vector<Vector3f> buffer(width * height);
 
-    Vector3f backgroundColor = output_->bkc_;
+    Vector3f backgroundColor = this->bkc_;
     Vector3f objectColor;
 
     if (backgroundColor.isZero())
@@ -127,7 +127,7 @@ void RayTracer::run()
             d.normalize();
             // we need to bring the direction back to unit length since it is a direction vector
 
-            Vector3f o = output_->centre_;
+            Vector3f o = this->centre_;
             // the origin of the ray taken from class output which is taken from the json file
 
             bool hitormiss = false;
@@ -170,5 +170,5 @@ void RayTracer::run()
         // so the sequence in the flat buffer is just rgbrgbrgbrgb over and over again
     }
 
-    save_ppm(output_->filename_, flatBuffer, width, height);
+    save_ppm(this->filename_, flatBuffer, width, height);
 };
