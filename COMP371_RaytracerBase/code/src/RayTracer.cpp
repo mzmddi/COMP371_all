@@ -73,6 +73,7 @@ void RayTracer::test_coding()
     cout << "lookat vector: "<<this->lookat_[0] << " " << this->lookat_[1] << " " << this->lookat_[2] << endl;
     cout << "background color: "<< this->bkc_[0] << " " << this->bkc_[1] << " " << this->bkc_[2] << std::endl;
 };
+   
 
 void RayTracer::run()
 {
@@ -81,6 +82,7 @@ void RayTracer::run()
 
     extract();
     test_coding();
+    // for testing the values
 
     Vector3f w = (this->centre_ - this->lookat_).normalized();
     // one of the basis vectors the w
