@@ -35,6 +35,12 @@ class RayTracer
     Vector3f getLookat();
     Vector3f getUp();
 
+    Vector3f w_;
+    Vector3f u_;
+    Vector3f v_;
+    // 3 basis vectors
+    // they should be normalised when creating them
+
 public:
     RayTracer(const nlohmann::json &input_j);
     void run();
@@ -50,4 +56,12 @@ private:
     // end goal -> populate the data structures we need with data from the json
 
     void test_coding();
+    void create_basis_vectors();
 };
+
+/*
+IMPORTANT NOTES:
+revision of errors:
+how to do a raytracer with the actual math
+
+*/

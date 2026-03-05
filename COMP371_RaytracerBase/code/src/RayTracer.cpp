@@ -46,9 +46,6 @@ void RayTracer::extract()
     // check if the json contains output
     if (json_.contains("output"))
     {
-        // output_ = new output();
-        // need to change this to basic constructor
-        //output_->extractInformation(json_["output"][0]);
         this->size_.push_back(json_["output"][0]["size"].at(0).get<int>());
         this->size_.push_back(json_["output"][0]["size"].at(1).get<int>());
         this->lookat_ << json_["output"][0]["lookat"].at(0).get<float>(), json_["output"][0]["lookat"].at(1).get<float>(), json_["output"][0]["lookat"].at(2).get<float>();
@@ -72,8 +69,19 @@ void RayTracer::test_coding()
     cout << "window size: " << this->size_[0] << " " << this->size_[1] << endl;
     cout << "lookat vector: "<<this->lookat_[0] << " " << this->lookat_[1] << " " << this->lookat_[2] << endl;
     cout << "background color: "<< this->bkc_[0] << " " << this->bkc_[1] << " " << this->bkc_[2] << std::endl;
+    cout << "3 basis vectors:" << endl;
+    cout << "w: " << this->w_.transpose() << " " << "u: " << this->u_.transpose() << " " << "v: " << this->v_.transpose() << endl;
+    cout << "lookat: " << this->lookat_.transpose() << " up: " << this->up_.transpose() << endl; 
+
 };
-   
+
+void RayTracer::create_basis_vectors() {
+    // this method abstracts the creation of the 3 basis vectors w,u,v
+
+    this->w_ = (this->centre_ - this->lookat_).normalized();
+    this->u_ = (this->up_.cross(this->w_)).normalized();
+    this->v_ = (this->w_.cross(this->u_)).normalized();  
+};
 
 void RayTracer::run()
 {
@@ -81,96 +89,90 @@ void RayTracer::run()
     // this is the entry point of my solution
 
     extract();
-    test_coding();
+    // test_coding();
     // for testing the values
 
-    Vector3f w = (this->centre_ - this->lookat_).normalized();
-    // one of the basis vectors the w
+    create_basis_vectors();
+    test_coding();
 
-    Vector3f u = this->up_.cross(w).normalized();
-    // the u basis vector which points to the right of the camera
+    // float width = (float)this->size_[0];
+    // float height = (float)this->size_[1];
 
-    Vector3f v = w.cross(u);
-    // the v basis vector which is up (very up)
+    // float theta = this->fov_ * (EIGEN_PI / 180.0f);
+    // float halfHeight = tan(theta / 2.0f);
+    // float aspectRatio = width / height;
+    // float halfWidth = aspectRatio * halfHeight;
 
-    float width = (float)this->size_[0];
-    float height = (float)this->size_[1];
+    // // create the vector of vectors that will store all our pixel values
+    // std::vector<Vector3f> buffer(width * height);
 
-    float theta = this->fov_ * (EIGEN_PI / 180.0f);
-    float halfHeight = tan(theta / 2.0f);
-    float aspectRatio = width / height;
-    float halfWidth = aspectRatio * halfHeight;
+    // Vector3f backgroundColor = this->bkc_;
+    // Vector3f objectColor;
 
-    // create the vector of vectors that will store all our pixel values
-    std::vector<Vector3f> buffer(width * height);
+    // if (backgroundColor.isZero())
+    // {
+    //     objectColor = Vector3f(1.0f, 1.0f, 0.0f);
+    // }
+    // else
+    // {
+    //     objectColor = Vector3f(0.0f, 0.0f, 0.0f);
+    // };
 
-    Vector3f backgroundColor = this->bkc_;
-    Vector3f objectColor;
+    // for (int j = 0; j < height; j++)
+    // {
+    //     for (int i = 0; i < width; i++)
+    //     {
+    //         // first we need to normalise the coordinates of the pixel between -1 and 1
+    //         float x = (2.0f * (i + 0.5f) / width) - 1.0f;
+    //         float y = 1.0f - (2.0f * (j + 0.5f) / height);
 
-    if (backgroundColor.isZero())
-    {
-        objectColor = Vector3f(1.0f, 1.0f, 0.0f);
-    }
-    else
-    {
-        objectColor = Vector3f(0.0f, 0.0f, 0.0f);
-    };
+    //         // now we calculate the direction of the ray coming out of this pixel x,y
+    //         Vector3f d = (x * halfWidth * u) + (y * halfHeight * v) - w;
+    //         d.normalize();
+    //         // we need to bring the direction back to unit length since it is a direction vector
 
-    for (int j = 0; j < height; j++)
-    {
-        for (int i = 0; i < width; i++)
-        {
-            // first we need to normalise the coordinates of the pixel between -1 and 1
-            float x = (2.0f * (i + 0.5f) / width) - 1.0f;
-            float y = 1.0f - (2.0f * (j + 0.5f) / height);
+    //         Vector3f o = this->centre_;
+    //         // the origin of the ray taken from class output which is taken from the json file
 
-            // now we calculate the direction of the ray coming out of this pixel x,y
-            Vector3f d = (x * halfWidth * u) + (y * halfHeight * v) - w;
-            d.normalize();
-            // we need to bring the direction back to unit length since it is a direction vector
+    //         bool hitormiss = false;
+    //         // false if the ray hit nothing, true if it did
 
-            Vector3f o = this->centre_;
-            // the origin of the ray taken from class output which is taken from the json file
+    //         float closesthit = std::numeric_limits<float>::max();
+    //         // we only care about the closest hit relative to the camera
 
-            bool hitormiss = false;
-            // false if the ray hit nothing, true if it did
+    //         for (auto s : shapes_)
+    //         {
+    //             if (s->intersect(o, d))
+    //             {
+    //                 hitormiss = true;
+    //                 break;
+    //                 // since this is the first ray tracing, im stopping here since we only need to know if it hits or not
+    //             }
+    //         };
+    //         int pixelPositionIndex = j * width + i;
+    //         if (hitormiss)
+    //         {
+    //             buffer[pixelPositionIndex] = objectColor;
+    //         }
+    //         else
+    //         {
+    //             buffer[pixelPositionIndex] = backgroundColor;
+    //         };
+    //     };
+    // };
 
-            float closesthit = std::numeric_limits<float>::max();
-            // we only care about the closest hit relative to the camera
+    // std::vector<double> flatBuffer;
+    // flatBuffer.reserve(width * height * 3);
+    // // i need to change my vector<Vector3f> buffer to a flat one with doubles only...
 
-            for (auto s : shapes_)
-            {
-                if (s->intersect(o, d))
-                {
-                    hitormiss = true;
-                    break;
-                    // since this is the first ray tracing, im stopping here since we only need to know if it hits or not
-                }
-            };
-            int pixelPositionIndex = j * width + i;
-            if (hitormiss)
-            {
-                buffer[pixelPositionIndex] = objectColor;
-            }
-            else
-            {
-                buffer[pixelPositionIndex] = backgroundColor;
-            };
-        };
-    };
+    // for (const auto &v : buffer)
+    // {
+    //     flatBuffer.push_back(static_cast<double>(v[0]));
+    //     flatBuffer.push_back(static_cast<double>(v[1]));
+    //     flatBuffer.push_back(static_cast<double>(v[2]));
+    //     // since the save_ppm file needs a flat vector, i need to push back each element in the Vector3f i created
+    //     // so the sequence in the flat buffer is just rgbrgbrgbrgb over and over again
+    // }
 
-    std::vector<double> flatBuffer;
-    flatBuffer.reserve(width * height * 3);
-    // i need to change my vector<Vector3f> buffer to a flat one with doubles only...
-
-    for (const auto &v : buffer)
-    {
-        flatBuffer.push_back(static_cast<double>(v[0]));
-        flatBuffer.push_back(static_cast<double>(v[1]));
-        flatBuffer.push_back(static_cast<double>(v[2]));
-        // since the save_ppm file needs a flat vector, i need to push back each element in the Vector3f i created
-        // so the sequence in the flat buffer is just rgbrgbrgbrgb over and over again
-    }
-
-    save_ppm(this->filename_, flatBuffer, width, height);
+    // save_ppm(this->filename_, flatBuffer, width, height);
 };
