@@ -16,6 +16,14 @@ using namespace std;
 
 // ---CODE---
 
+struct Ray {
+    Vector3f o;
+    Vector3f d;
+    Ray(Vector3f origin, Vector3f direction) {
+        o = origin;
+        d = direction;
+    };
+};
 
 class RayTracer
 {
@@ -35,11 +43,27 @@ class RayTracer
     Vector3f getLookat();
     Vector3f getUp();
 
-    Vector3f w_;
-    Vector3f u_;
-    Vector3f v_;
+    Vector3f w_basis;
+    Vector3f u_basis;
+    Vector3f v_basis;
     // 3 basis vectors
     // they should be normalised when creating them
+
+    float view_plane_height;
+    float view_plane_width;
+    // the view plane variables
+
+    Vector3f u_pixel_step;
+    Vector3f v_pixel_step;
+    // the u and v axis vectors, coefficients used for finding which pixel corresponds to where on the view plane i think
+
+    Vector3f du_pixel_steps;
+    Vector3f dv_pixel_steps;
+    // using u and v, this is the length in the image world of what is one pixel
+
+    Vector3f view_plane_start;
+    Vector3f pixel_start;
+    // figuring out where the loops will start at
 
 public:
     RayTracer(const nlohmann::json &input_j);
@@ -57,6 +81,8 @@ private:
 
     void test_coding();
     void create_basis_vectors();
+    void create_camera_data();
+    Ray create_ray(int j, int i);
 };
 
 /*

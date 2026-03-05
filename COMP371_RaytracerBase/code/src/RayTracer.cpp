@@ -8,10 +8,12 @@
 #include <string>
 #include "Eigen/Dense"
 #include "simpleppm.h"
+#include "HitRecord.h"
 
 using namespace std;
 
 //---CODE---
+
 
 RayTracer::RayTracer(const nlohmann::json &input_j) : json_(input_j) {}
 
@@ -70,7 +72,7 @@ void RayTracer::test_coding()
     cout << "lookat vector: "<<this->lookat_[0] << " " << this->lookat_[1] << " " << this->lookat_[2] << endl;
     cout << "background color: "<< this->bkc_[0] << " " << this->bkc_[1] << " " << this->bkc_[2] << std::endl;
     cout << "3 basis vectors:" << endl;
-    cout << "w: " << this->w_.transpose() << " " << "u: " << this->u_.transpose() << " " << "v: " << this->v_.transpose() << endl;
+    cout << "w: " << this->w_basis.transpose() << " " << "u: " << this->u_basis.transpose() << " " << "v: " << this->v_basis.transpose() << endl;
     cout << "lookat: " << this->lookat_.transpose() << " up: " << this->up_.transpose() << endl; 
 
 };
@@ -78,22 +80,81 @@ void RayTracer::test_coding()
 void RayTracer::create_basis_vectors() {
     // this method abstracts the creation of the 3 basis vectors w,u,v
 
-    this->w_ = (this->centre_ - this->lookat_).normalized();
-    this->u_ = (this->up_.cross(this->w_)).normalized();
-    this->v_ = (this->w_.cross(this->u_)).normalized();  
+    this->w_basis = (this->centre_ - this->lookat_).normalized();
+    this->u_basis = (this->up_.cross(this->w_basis)).normalized();
+    this->v_basis = (this->w_basis.cross(this->u_basis)).normalized();  
 };
 
+void RayTracer::create_camera_data() {
+
+    this->view_plane_height = 2 * tan(this->fov_ / 180 * M_PI / 2) * this->lookat_.norm();
+    this->view_plane_width = view_plane_height * this->size_[0] / this->size_[1];
+    // creating the view plane height and width from the fov and aspect ratio
+    // view plane is the "rectangle" from which the pixels are going to be drawn from, but using the measurements of the image world
+
+    this->u_pixel_step = Vector3f(this->view_plane_width, 0, 0);
+    this->v_pixel_step = Vector3f(0, -this->view_plane_height, 0); 
+    // the entire width and height of the plane world in one vector
+
+    this->du_pixel_steps = this->u_pixel_step / this->size_[0];
+    this->dv_pixel_steps = this->v_pixel_step / this->size_[1];
+    // now dv and du are the image world sizes for one plane view world pixel
+
+    this->view_plane_start = this->centre_ + this->lookat_ - this->u_pixel_step/2.0 - this->v_pixel_step/2.0;
+    // view plane start is top left of the view plane
+    this->pixel_start = this->view_plane_start + (this->du_pixel_steps + this->dv_pixel_steps)/2.0;
+    // the rays should come from the center of the pixel, so i need to offset the view plane start coordinates by half the size of a single pixel
+
+};  
+
+Ray RayTracer::create_ray(int j, int i){
+    Vector3f o = this->centre_;
+    Vector3f d = this->view_plane_start + i*this->du_pixel_steps + j*this->dv_pixel_steps - this->centre_;
+    return Ray(o, d);
+}
 void RayTracer::run()
 {
     // this is the method called by the main.cpp file
     // this is the entry point of my solution
 
     extract();
-    // test_coding();
-    // for testing the values
 
     create_basis_vectors();
-    test_coding();
+
+    create_camera_data();
+
+    // main loop of shooting rays
+    // int total_rays = 0;
+    // int total_num_of_loops = 0;
+    for (int j = 0; j < this->size_[1]; j++){
+        for (int i = 0; i < this->size_[0]; i++) {
+
+            Ray r = create_ray(j, i); 
+            // step number 1 from the manual --> ray generation
+            total_rays++;
+            int counter_shapes = 1;
+            for (auto s = this->shapes_.begin(); s != this->shapes_.end(); s++ ){
+                // cout << "\rDoing row : " << setfill('0') << setw(3) << j << " Total num of rays generated: " << setfill('0') << setw(10) << total_rays << flush;
+                // total_num_of_loops++;
+
+                float t = (*s)->intersect(r)
+                // need to go in the shapes class and do the intersection method
+
+                // if t is a real value, create call method HitRecord::new_hit
+                // pass all the relevent information to that method
+                // that method should first check if at pixel j,i there's a hit, if there is, then compare the new t to the previous t already there -> keep the one thats the smallest
+
+                
+
+            };
+
+        };
+    };
+    // cout << endl;
+    // cout << "total num of loops: " << total_num_of_loops << endl;
+
+    // ONCE loop is done, send the data from the HitRecord to the saveppm thing
+
 
     // float width = (float)this->size_[0];
     // float height = (float)this->size_[1];

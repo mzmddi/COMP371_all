@@ -15,10 +15,10 @@ using namespace std;
 string sphere::getType() { return type_; };
 void sphere::extractInformation(const nlohmann::json &j)
 {
-    if (j.contains("type") && j.contains("radius") && j.contains("center") && j.contains("ka") && j.contains("kd") && j.contains("ks") && j.contains("pc") && j.contains("ac") && j.contains("dc") && j.contains("sc"))
+    if (j.contains("type") && j.contains("radius") && j.contains("centre") && j.contains("ka") && j.contains("kd") && j.contains("ks") && j.contains("pc") && j.contains("ac") && j.contains("dc") && j.contains("sc"))
     {
         this->type_ = "sphere";
-        this->center_ << j["center"][0].get<float>(), j["center"][1].get<float>(), j["center"][2].get<float>();
+        this->center_ << j["centre"][0].get<float>(), j["centre"][1].get<float>(), j["centre"][2].get<float>();
         this->radius_ = j["radius"].get<float>();
         this->ka_ = j["ka"].get<float>();
         this->kd_ = j["kd"].get<float>();

@@ -16,10 +16,7 @@ class shape
 public:
     shape() {}
     virtual ~shape() = default;
-
-protected:
     string type_;
-
     float ka_;
     float kd_;
     float ks_;
