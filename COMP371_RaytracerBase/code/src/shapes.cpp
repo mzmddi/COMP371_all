@@ -7,6 +7,8 @@
 #include <string>
 #include <Eigen/Dense>
 using namespace std;
+#include "Ray.h"
+#include <limits.h>
 
 // ---CODE----
 
@@ -18,8 +20,8 @@ void sphere::extractInformation(const nlohmann::json &j)
     if (j.contains("type") && j.contains("radius") && j.contains("centre") && j.contains("ka") && j.contains("kd") && j.contains("ks") && j.contains("pc") && j.contains("ac") && j.contains("dc") && j.contains("sc"))
     {
         this->type_ = "sphere";
-        this->center_ << j["centre"][0].get<float>(), j["centre"][1].get<float>(), j["centre"][2].get<float>();
-        this->radius_ = j["radius"].get<float>();
+        this->sph_centre << j["centre"][0].get<float>(), j["centre"][1].get<float>(), j["centre"][2].get<float>();
+        this->sph_radius = j["radius"].get<float>();
         this->ka_ = j["ka"].get<float>();
         this->kd_ = j["kd"].get<float>();
         this->ks_ = j["ks"].get<float>();
@@ -43,28 +45,57 @@ void sphere::extractInformation(const nlohmann::json &j)
     };
 };
 ;
-bool sphere::intersect(const Vector3f &o, const Vector3f &d)
+float sphere::intersect(Ray r)
 {
-    Vector3f oc = o - this->center_;
-    float a = d.dot(d);
-    float b = 2.0f * oc.dot(d);
-    float c = oc.dot(oc) - (this->radius_ * this->radius_);
-    float underthesquare = b * b - 4 * c;
-    // we set up our quadratic equation and we find the part thats under the square
+    // chapter 4 of manual -> intersection with a sphere
 
-    if (underthesquare < 0)
-    {
-        // if under the square is negative, it's imaginary # and we dont work with that
-        return false;
+    // 1) calculate the value under the square root first
+
+    float b = (2.0f * r.d).dot(r.o-this->sph_centre);
+    float a = (r.d).dot(r.d);
+    float c = ((r.o-this->sph_centre).dot(r.o-this->sph_centre)) - this->sph_radius*this->sph_radius;
+
+    float float_under_squareroot = b*b - 4.0f*a*c;
+
+    if (float_under_squareroot < 0) {
+        return std::numeric_limits<float>::infinity();
     };
-    float sqr = sqrt(underthesquare);
-    float first_t = (-b - sqr) / 2.0f / a;
-    float second_t = (-b + sqr) / 2.0f / a;
-    // calculating the value under the root
 
-    float small_t = std::min(first_t, second_t);
-    float big_t = std::max(first_t, second_t);
-    return true;
+    float t1 = (-b + float_under_squareroot) / (2.0f * a);
+    float t2 = (-b - float_under_squareroot) / (2.0f * a);
+
+    if (t1 == t2 | t1 < t2) {
+        // one value extracted, which means ray is tangent to the surface
+        return t1;
+        // i think returning any of the two values is okay since its the same??
+        // also return t1 if it is smaller
+    } else if (t1 > t2) {
+        return t2;
+    }
+
+    // Vector3f o = r.o;
+    // Vector3f d = r.d;
+    
+    // Vector3f oc = o - this->center_;
+    // float a = d.dot(d);
+    // float b = 2.0f * oc.dot(d);
+    // float c = oc.dot(oc) - (this->radius_ * this->radius_);
+    // float underthesquare = b * b - 4 * c;
+    // // we set up our quadratic equation and we find the part thats under the square
+
+    // if (underthesquare < 0)
+    // {
+    //     // if under the square is negative, it's imaginary # and we dont work with that
+    //     return false;
+    // };
+    // float sqr = sqrt(underthesquare);
+    // float first_t = (-b - sqr) / 2.0f / a;
+    // float second_t = (-b + sqr) / 2.0f / a;
+    // // calculating the value under the root
+
+    // float small_t = std::min(first_t, second_t);
+    // float big_t = std::max(first_t, second_t);
+    // return true;
 };
 // Rectangle methods
 string rectangle::getType() { return type_; };
@@ -99,43 +130,46 @@ void rectangle::extractInformation(const nlohmann::json &j)
         exit(0);
     };
 };
-bool rectangle::intersect(const Vector3f &o, const Vector3f &d)
+float rectangle::intersect(Ray r)
 {
-    Vector3f e1 = this->p2_ - this->p1_;
-    Vector3f e2 = this->p3_ - this->p1_;
-    Vector3f n_rec = e1.cross(e2).normalized();
+    return 0.0f;
+    // Vector3f o = r.o;
+    // Vector3f d = r.d;
+    // Vector3f e1 = this->p2_ - this->p1_;
+    // Vector3f e2 = this->p3_ - this->p1_;
+    // Vector3f n_rec = e1.cross(e2).normalized();
 
-    float deno = n_rec.dot(d);
-    // check if the ray is paralelle to the plane or close to paralelle
+    // float deno = n_rec.dot(d);
+    // // check if the ray is paralelle to the plane or close to paralelle
 
-    if (deno < 1e-5)
-    {
-        return false;
-    };
-    float t = -n_rec.dot(o) / deno;
+    // if (deno < 1e-5)
+    // {
+    //     return false;
+    // };
+    // float t = -n_rec.dot(o) / deno;
 
-    if (t < 0.00001f)
-    {
-        return false;
-    };
-    // if its behind the camera
+    // if (t < 0.00001f)
+    // {
+    //     return false;
+    // };
+    // // if its behind the camera
 
-    Vector3f hp = o + t * d;
-    // finding the hit point
+    // Vector3f hp = o + t * d;
+    // // finding the hit point
 
-    float q1 = (this->p2_ - this->p1_).cross(hp - this->p1_).dot(n_rec);
-    float q2 = (this->p3_ - this->p2_).cross(hp - this->p2_).dot(n_rec);
-    float q3 = (this->p4_ - this->p3_).cross(hp - this->p3_).dot(n_rec);
-    float q4 = (this->p1_ - this->p4_).cross(hp - this->p4_).dot(n_rec);
-    // we calculate everything we need for determining if its inside the rectangle or outside of it
+    // float q1 = (this->p2_ - this->p1_).cross(hp - this->p1_).dot(n_rec);
+    // float q2 = (this->p3_ - this->p2_).cross(hp - this->p2_).dot(n_rec);
+    // float q3 = (this->p4_ - this->p3_).cross(hp - this->p3_).dot(n_rec);
+    // float q4 = (this->p1_ - this->p4_).cross(hp - this->p4_).dot(n_rec);
+    // // we calculate everything we need for determining if its inside the rectangle or outside of it
 
-    if (q1 * q2 >= 0 && q2 * q3 > 0 && q1 * q4 > 0 && q2 * q4 > 0)
-    // the logic here is that if all of them are either all negative or postive, they will all product a positive product
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    };
+    // if (q1 * q2 >= 0 && q2 * q3 > 0 && q1 * q4 > 0 && q2 * q4 > 0)
+    // // the logic here is that if all of them are either all negative or postive, they will all product a positive product
+    // {
+    //     return true;
+    // }
+    // else
+    // {
+    //     return false;
+    // };
 };

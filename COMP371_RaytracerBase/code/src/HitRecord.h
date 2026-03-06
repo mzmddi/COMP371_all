@@ -8,6 +8,7 @@ This class stores any and all hits from the ray to an object
 using Eigen::Vector3f;
 #include <Eigen/Geometry>
 #include <vector>
+#include <limits>
 
 // ---CODE---
 
@@ -15,7 +16,7 @@ struct Hit{
     // hit struct will just store the meta data of a hit, if it occurs
     // more than one hit can occure for the same pixel, hence why save the hit and not just the first one
     
-    float t;
+    float t = std::numeric_limits<float>::infinity();
     // distance from centre to the shape it has hit
 
     int j, i;
@@ -35,6 +36,6 @@ class HitRecord {
     // holding all the hits
 
 public:
-    HitRecord();
-    void insert_new_hit();
+    HitRecord(int i, int j);
+    void new_hit(int i, int j, float t);
 };

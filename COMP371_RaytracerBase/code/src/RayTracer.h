@@ -14,16 +14,9 @@ using Eigen::Vector3f;
 #include <vector>
 using namespace std;
 
-// ---CODE---
+#include "Ray.h"
 
-struct Ray {
-    Vector3f o;
-    Vector3f d;
-    Ray(Vector3f origin, Vector3f direction) {
-        o = origin;
-        d = direction;
-    };
-};
+// ---CODE---
 
 class RayTracer
 {

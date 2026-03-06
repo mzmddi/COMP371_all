@@ -8,8 +8,10 @@ using Eigen::Matrix4f;
 using Eigen::Vector3f;
 #include "json.hpp"
 using namespace std;
+#include "Ray.h"
 
 //---CODE---
+
 
 class shape
 {
@@ -36,20 +38,20 @@ public:
 public:
     virtual string getType() = 0;
     virtual void extractInformation(const nlohmann::json &j) = 0;
-    virtual bool intersect(const Vector3f &o, const Vector3f &d) = 0;
+    virtual float intersect(Ray r) = 0;
 };
 
 class sphere : public shape
 {
-    Vector3f center_;
-    float radius_;
+    Vector3f sph_centre;
+    float sph_radius;
 
 public:
     sphere() {}
     // all the other methods for this class
     string getType() override;
     void extractInformation(const nlohmann::json &j) override;
-    bool intersect(const Vector3f &o, const Vector3f &d) override;
+    float intersect(Ray r) override;
 };
 
 class rectangle : public shape
@@ -65,5 +67,5 @@ public:
     // in the assignmemnt, it says assume all points are coplanar
     string getType() override;
     void extractInformation(const nlohmann::json &j) override;
-    bool intersect(const Vector3f &o, const Vector3f &d) override;
+    float intersect(Ray r) override;
 };

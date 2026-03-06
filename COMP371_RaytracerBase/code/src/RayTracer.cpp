@@ -9,6 +9,7 @@
 #include "Eigen/Dense"
 #include "simpleppm.h"
 #include "HitRecord.h"
+#include "Ray.h"
 
 using namespace std;
 
@@ -107,9 +108,9 @@ void RayTracer::create_camera_data() {
 
 };  
 
-Ray RayTracer::create_ray(int j, int i){
+Ray RayTracer::create_ray(int i, int j){
     Vector3f o = this->centre_;
-    Vector3f d = this->view_plane_start + i*this->du_pixel_steps + j*this->dv_pixel_steps - this->centre_;
+    Vector3f d = this->view_plane_start + j*this->du_pixel_steps + i*this->dv_pixel_steps - this->centre_;
     return Ray(o, d);
 }
 void RayTracer::run()
@@ -122,23 +123,31 @@ void RayTracer::run()
     create_basis_vectors();
 
     create_camera_data();
+    
+    HitRecord hr(this->size_[0], this->size_[1]);
 
     // main loop of shooting rays
     // int total_rays = 0;
     // int total_num_of_loops = 0;
-    for (int j = 0; j < this->size_[1]; j++){
-        for (int i = 0; i < this->size_[0]; i++) {
+    for (int i = 0; i < this->size_[1]; i++){
+        // row i
+        for (int j = 0; j < this->size_[0]; j++) {
+            // column j
 
-            Ray r = create_ray(j, i); 
+            Ray r = create_ray(i, j); 
             // step number 1 from the manual --> ray generation
-            total_rays++;
-            int counter_shapes = 1;
+            // total_rays++;
+            // int counter_shapes = 1;
             for (auto s = this->shapes_.begin(); s != this->shapes_.end(); s++ ){
                 // cout << "\rDoing row : " << setfill('0') << setw(3) << j << " Total num of rays generated: " << setfill('0') << setw(10) << total_rays << flush;
                 // total_num_of_loops++;
 
-                float t = (*s)->intersect(r)
+                float t = (*s)->intersect(r);
                 // need to go in the shapes class and do the intersection method
+
+                hr.new_hit(i, j, t);
+
+
 
                 // if t is a real value, create call method HitRecord::new_hit
                 // pass all the relevent information to that method
@@ -235,5 +244,21 @@ void RayTracer::run()
     //     // so the sequence in the flat buffer is just rgbrgbrgbrgb over and over again
     // }
 
-    // save_ppm(this->filename_, flatBuffer, width, height);
+    // vector<double> flatBuffer;
+    // flatBuffer.reserve(this->size_[0] * this->size_[1] * 3);
+
+    // for (int i = 0; i < this->size_[0]*this->size_[1]; i++){
+    //     if (i % 2 == 0) {
+    //         flatBuffer.push_back(0.5d);
+    //         flatBuffer.push_back(0.0d);
+    //         flatBuffer.push_back(0.5d);
+    //     }
+    //     else {
+    //         flatBuffer.push_back(1.0d);
+    //         flatBuffer.push_back(1.0d);
+    //         flatBuffer.push_back(1.0d);
+    //     };
+    // };
+
+    // save_ppm(this->filename_, flatBuffer, this->size_[0], this->size_[1]);
 };
