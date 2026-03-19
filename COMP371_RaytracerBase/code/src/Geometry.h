@@ -38,7 +38,7 @@ class Geom {
 
 public:
     
-    Geom(); 
+    Geom() {}; 
     // constructor for virtual class
 
     std::string get_type() const {return type;}
@@ -65,6 +65,15 @@ public:
 
     virtual float intersect() = 0;
     // virtual methods that ill implement in the child classes
+
+    float get_radius() {return 0.0f;};
+    Eigen::Vector3f get_centre() {return Eigen::Vector3f(0.0f, 0.0f, 0.0f);};
+    // Eigen::Vector3f get_p1(); 
+    // Eigen::Vector3f get_p2() ;
+    // Eigen::Vector3f get_p3();
+    // Eigen::Vector3f get_p4();
+    // Eigen::Vector3f get_n();
+    // declarations so i can call these from Geoms
 
     virtual ~Geom() = default; 
     // destructor for the virtual class
