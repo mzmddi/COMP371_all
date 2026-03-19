@@ -78,7 +78,7 @@ void RayTracer::extract_data()
         {
             if (l.contains("use"))
             {
-                if (l["use"] == false)
+                if (!l["use"])
                 {
                     continue;
                 }
@@ -103,7 +103,7 @@ void RayTracer::extract_data()
             {
                 PointLight *pl = new PointLight();
 
-                pl->set_centre(Eigen::Vector3f(l["centre"][0]), Eigen::Vector3f(l["centre"][1]), Eigen::Vector3f(l["centre"][2]));
+                pl->set_centre(Eigen::Vector3f(l["centre"][0], l["centre"][1], l["centre"][2]));
 
                 light = pl;
             };
@@ -112,12 +112,12 @@ void RayTracer::extract_data()
             light->set_id(Eigen::Vector3f(l["id"][0], l["id"][1], l["id"][2]));
             light->set_is(Eigen::Vector3f(l["is"][0], l["is"][1], l["is"][2]));
 
-            if (l.contains["transform"])
+            if (l.contains("transform"))
             {
                 // code that handles the transform transfer
             };
 
-            if (l.contains["usecenter"])
+            if (l.contains("usecenter"))
             {
                 light->set_usecenter(bool(l["usecenter"]));
             };
@@ -139,38 +139,73 @@ void RayTracer::extract_data()
         for (const auto &o : this->json_obj["output"])
         {
 
-            // void set_output_filename(std::string s) { this->output_filename = s; };
-            // void set_width(int s) { this->width = s; };
-            // void set_height(int s) { this->height = s; };
-            // void set_fov(float s) { this->fov = s; };
-            // void set_centre(Eigen::Vector3f s) { this->centre = s; };
-            // void set_up(Eigen::Vector3f s) { this->up = s; };
-            // void set_lookat(Eigen::Vector3f s) { this->lookat = s; };
-            // void set_ai(Eigen::Vector3f s) { this->ai = s; };
-            // void set_bkc(Eigen::Vector3f s) { this->bkc = s; };
-            // void set_using_rayperpixel(bool s) { this->using_rayperpixel = s; };
-            // void set_raysperpixel(Eigen::VectorXf s) { this->raysperpixel = s; };
-            // void set_globalillum(bool s) { this->globalillum = s; };
-            // void set_antialiasing(bool s) { this->antialiasing = s; };
-            // void set_twosiderender(bool s) { this->twosiderender = s; };
-            // void set_maxbounces(int s) { this->maxbounces = s; };
-            // void set_probterminate(float s) { this->probterminate = s; };
-
             Output *output = new Output();
 
-            // std::string output_filename;
-            // int width;
-            // int height;
-            // float fov;
-            // Eigen::Vector3f centre;
-            // Eigen::Vector3f up;
-            // Eigen::Vector3f lookat;
-            // Eigen::Vector3f ai;
-            // Eigen::Vector3f bkc;
-            // // all the mandatory members from the output
-
             output->set_output_filename(std::string(o["filename"]));
-            
+            output->set_width(int(o["size"][0]));
+            output->set_height(int(o["size"][1]));
+            output->set_fov(float(o["fov"]));
+            output->set_centre(Eigen::Vector3f(o["centre"][0], o["centre"][1], o["centre"][2]));
+            output->set_up(Eigen::Vector3f(o["up"][0], o["up"][1], o["up"][2]));
+            output->set_lookat(Eigen::Vector3f(o["lookat"][0], o["lookat"][1], o["lookat"][2]));
+            output->set_ai(Eigen::Vector3f(o["ai"][0], o["ai"][1], o["ai"][2]));
+            output->set_bkc(Eigen::Vector3f(o["bkc"][0], o["bkc"][1], o["bkc"][2]));
+            // assigning all the mandatory values first
+
+            if (o.contains("raysperpixel"))
+            {
+                output->set_using_rayperpixel(true);
+                int len_raysperpixel = o["raysperpixel"].size();
+                if (len_raysperpixel == 1)
+                {
+                    Eigen::VectorXf v(1);
+                    v[0] = o["raysperpixel"][0].get<float>();
+                    output->set_raysperpixel(v);
+                }
+                else if (len_raysperpixel == 2)
+                {
+                    Eigen::VectorXf v(2);
+                    v[0] = o["raysperpixel"][0].get<float>();
+                    v[1] = o["raysperpixel"][1].get<float>();
+                    output->set_raysperpixel(v);
+                }
+                else if (len_raysperpixel == 3)
+                {
+                    Eigen::VectorXf v(3);
+                    v[0] = o["raysperpixel"][0].get<float>();
+                    v[1] = o["raysperpixel"][1].get<float>();
+                    v[2] = o["raysperpixel"][2].get<float>();
+                    output->set_raysperpixel(v);
+                }
+                else
+                {
+                    std::cout << "More than 3 values are given for raysperpixel, when the Max is 3. Failure." << std::endl;
+                    std::exit(0);
+                };
+
+                if (o.contains("antialiasing"))
+                {
+                    output->set_antialiasing(bool(o["antialiasing"]));
+                };
+            };
+            if (o.contains("twosiderender"))
+            {
+                output->set_twosiderender(bool(o["twosiderender"]));
+            };
+            if (o.contains("globalillum"))
+            {
+                output->set_globalillum(bool(o["globalillum"]));
+            };
+            if (o.contains("maxbounces"))
+            {
+                output->set_maxbounces(float(o["maxbounces"]));
+            };
+            if (o.contains("probterminate"))
+            {
+                output->set_probterminate(float(o["probterminate"]));
+            };
+
+            this->outputs.push_back(output);
         };
     }
     else
@@ -179,14 +214,21 @@ void RayTracer::extract_data()
     }
 };
 
-void RayTracer::test()
-{
+void RayTracer::test() {
     // just a quick test function that returns specific values so that i can make sure things are working correctly
 
-    for (const auto &i : this->geoms)
-    {
-        i->test();
-    }
+    // for (const auto &i : this->geoms)
+    // {
+    //     i->test();
+    // };
+    // for (const auto &i : this->lights)
+    // {
+    //     i->test();
+    // };
+    // for (const auto &i : this->outputs)
+    // {
+    //     i->test();
+    // };
 };
 
 void RayTracer::run()

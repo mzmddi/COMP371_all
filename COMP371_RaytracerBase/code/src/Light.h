@@ -32,16 +32,16 @@ public:
     Eigen::Matrix4f get_transform() const { return this->transform; };
     int get_n() const { return this->n; };
     bool get_usecenter() const { return this->usecenter; };
-    bool get_use() const { return this->use };
+    bool get_use() const { return this->use; };
     // all the getters
 
     void set_type(std::string s) { this->type = s; };
     void set_id(Eigen::Vector3f s) { this->id = s; };
-    void set_is(Eigen::VEctor3f s) { this->s = s; }:
-    void set_transform(Eigen::Matrix4f s) {this->transform = s;};
-    void set_n(int s) { this->n = 1; };
+    void set_is(Eigen::Vector3f s) { this->is = s; };
+    void set_transform(Eigen::Matrix4f s) { this->transform = s; };
+    void set_n(int s) { this->n = s; };
     void set_usecenter(bool s) { this->usecenter = s; };
-    void set_use(bool s) { this->use = s };
+    void set_use(bool s) { this->use = s; };
     // all the setters
 
     virtual void test() = 0;

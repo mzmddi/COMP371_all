@@ -27,6 +27,15 @@ class Output
     // using the bool using_rayperpixel to check if rayperpixel is used or not
 
     bool globalillum = false;
+    // When true render with global illumination (path
+    // tracing using monte carlo integration). You can
+    // assume only diffuse lighting. When false (default
+    // value) rendering using the full Phong shader.
+    // Use the rayperpixel variable as a strategy for the
+    // initial ray cast. If raysperpixel is not specified, you can
+    // make your own choices in terms of how many rays to
+    // send and what type of sampling to use.
+
     bool antialiasing;
     // be carefull, this is optional, but no default values
     // linked to if rayperpixel is defined or not
@@ -40,7 +49,7 @@ class Output
     // object. If no value is specified, the default value is
     // true.
 
-    int maxbounces = 0;
+    float maxbounces = 0;
     // setting the default to 0
     // Maximum number of times the ray can bounce. A
     // value of 0 would reduce this to a ray tracer (i.e. a
@@ -67,7 +76,7 @@ public:
     bool get_globalillum() const { return this->globalillum; };
     bool get_antialiasing() const { return this->antialiasing; };
     bool get_twosiderender() const { return this->twosiderender; };
-    int get_maxbounces() const { return this->maxbounces; };
+    float get_maxbounces() const { return this->maxbounces; };
     float get_probterminate() const { return this->probterminate; };
     // all the getters for all the output variables
 
@@ -85,9 +94,11 @@ public:
     void set_globalillum(bool s) { this->globalillum = s; };
     void set_antialiasing(bool s) { this->antialiasing = s; };
     void set_twosiderender(bool s) { this->twosiderender = s; };
-    void set_maxbounces(int s) { this->maxbounces = s; };
+    void set_maxbounces(float s) { this->maxbounces = s; };
     void set_probterminate(float s) { this->probterminate = s; };
     // all the setters for every single class attribute
+
+    void test() {};
 };
 
 #endif

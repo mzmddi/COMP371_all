@@ -22,6 +22,7 @@ class RayTracer
 
     std::vector<Geom *> geoms;
     std::vector<Light *> lights;
+    std::vector<Output *> outputs;
 
 public:
     RayTracer(const nlohmann::json &input_j);
