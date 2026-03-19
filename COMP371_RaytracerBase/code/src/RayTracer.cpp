@@ -10,23 +10,27 @@
 
 RayTracer::RayTracer(const nlohmann::json &input_j) : json_obj(input_j) {};
 
-void RayTracer::extract_data(){
+void RayTracer::extract_data()
+{
 
-    if (this->json_obj.contains("geometry") && (this->json_obj["geometry"].size() >= 1)) {
+    if (this->json_obj.contains("geometry") && (this->json_obj["geometry"].size() >= 1))
+    {
 
-        for (const auto& g : this->json_obj["geometry"]) {
-            Geom* geo = nullptr;
+        for (const auto &g : this->json_obj["geometry"])
+        {
+            Geom *geo = nullptr;
 
-            if (g["type"] == "sphere") {
+            if (g["type"] == "sphere")
+            {
 
                 Sphere *s = new Sphere();
 
                 s->set_radius(float(g["radius"]));
                 s->set_centre(Eigen::Vector3f(g["centre"][0], g["centre"][1], g["centre"][2]));
                 geo = s;
-                
-
-            } else if (g["type"] == "rectangle"){
+            }
+            else if (g["type"] == "rectangle")
+            {
 
                 Rectangle *r = new Rectangle();
 
@@ -38,9 +42,9 @@ void RayTracer::extract_data(){
                 Eigen::Vector3f calculated_normal = (r->get_p2() - r->get_p1()).cross(r->get_p4() - r->get_p1()).normalized();
                 r->set_n(calculated_normal);
                 geo = r;
-
-
-            } else {
+            }
+            else
+            {
                 std::cout << "Geometry other than sphere or rectangle detected. Failure." << std::endl;
                 std::exit(0);
             };
@@ -55,34 +59,105 @@ void RayTracer::extract_data(){
             geo->set_pc(float(g["pc"]));
             // the obligated members shared by both rec and sph
 
-            if (g.contains("transform")) {
+            if (g.contains("transform"))
+            {
                 // do something with the transform
             };
 
             this->geoms.push_back(geo);
         };
-
-    } else {
+    }
+    else
+    {
         std::cout << "JSON file needs to have at least 1 geometry. Detected 0." << std::endl;
     };
 
-    if (this->json_obj.contains("light") && (this->json_obj["light"].size() >= 1 )) {
+    if (this->json_obj.contains("light") && (this->json_obj["light"].size() >= 1))
+    {
+        for (const auto &l : this->json_obj["light"])
+        {
+            if (l.contains("use"))
+            {
+                if (l["use"] == false)
+                {
+                    continue;
+                }
+            }
+            Light *light = nullptr;
+            // forward declare one pointer used for this light source
 
-    } else {
+            if (l["type"] == "area")
+            {
+
+                AreaLight *al = new AreaLight();
+
+                al->set_p1(Eigen::Vector3f(l["p1"][0], l["p1"][1], l["p1"][2]));
+                al->set_p2(Eigen::Vector3f(l["p2"][0], l["p2"][1], l["p2"][2]));
+                al->set_p3(Eigen::Vector3f(l["p3"][0], l["p3"][1], l["p3"][2]));
+                al->set_p4(Eigen::Vector3f(l["p4"][0], l["p4"][1], l["p4"][2]));
+                // setting all the area light corners
+
+                light = al;
+            }
+            else if (l["type"] == "point")
+            {
+                PointLight *pl = new PointLight();
+
+                pl->set_centre(Eigen::Vector3f(l["centre"][0]), Eigen::Vector3f(l["centre"][1]), Eigen::Vector3f(l["centre"][2]));
+
+                light = pl;
+            };
+
+            light->set_type(std::string(l["type"]));
+            light->set_id(Eigen::Vector3f(l["id"][0], l["id"][1], l["id"][2]));
+            light->set_is(Eigen::Vector3f(l["is"][0], l["is"][1], l["is"][2]));
+
+            if (l.contains["transform"])
+            {
+                // code that handles the transform transfer
+            };
+
+            if (l.contains["usecenter"])
+            {
+                light->set_usecenter(bool(l["usecenter"]));
+            };
+            if (l.contains("n"))
+            {
+                light->set_n(int(l["n"]));
+            };
+
+            this->lights.push_back(light);
+        };
+    }
+    else
+    {
         std::cout << "JSON file needs to have at least 1 light. Detected 0." << std::endl;
     };
+
+    if (this->json_obj.contains("output") && (this->json_obj["output"].size() >= 1))
+    {
+        for (const auto &o : this->json_obj["o"])
+        {
+        };
+    }
+    else
+    {
+        std::cout << "JSON file needs to have at least 1 output. Detected 0." << std::endl;
+    }
 };
 
-void RayTracer::test() {
+void RayTracer::test()
+{
     // just a quick test function that returns specific values so that i can make sure things are working correctly
 
-    for (const auto& i : this->geoms) {
+    for (const auto &i : this->geoms)
+    {
         i->test();
     }
-
 };
 
-void RayTracer::run(){
+void RayTracer::run()
+{
 
     this->extract_data();
     this->test();
