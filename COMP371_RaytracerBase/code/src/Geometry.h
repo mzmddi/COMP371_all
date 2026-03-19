@@ -64,16 +64,8 @@ public:
     // all of the setters defined and implemented 
 
     virtual float intersect() = 0;
+    virtual void test() = 0;
     // virtual methods that ill implement in the child classes
-
-    float get_radius() {return 0.0f;};
-    Eigen::Vector3f get_centre() {return Eigen::Vector3f(0.0f, 0.0f, 0.0f);};
-    // Eigen::Vector3f get_p1(); 
-    // Eigen::Vector3f get_p2() ;
-    // Eigen::Vector3f get_p3();
-    // Eigen::Vector3f get_p4();
-    // Eigen::Vector3f get_n();
-    // declarations so i can call these from Geoms
 
     virtual ~Geom() = default; 
     // destructor for the virtual class
@@ -89,16 +81,18 @@ public:
 
     Sphere() : Geom() {};
 
-    float get_radius() const {return radius;}
-    Eigen::Vector3f get_centre() const {return centre;}
+    float get_radius() const {return this->radius;};
+    Eigen::Vector3f get_centre() const {return this->centre;};
     // additional getters for sphere since not present in parent class
 
     void set_radius(float s) {radius = s;}
     void set_centre(Eigen::Vector3f s) {centre = s;}
-    // additional setters for sphere
+    // additional setters for sphere 
 
     float intersect() override;
     // intersection for sphere specifically
+
+    void test() override;
 };
 
 class Rectangle : public Geom {
@@ -118,11 +112,11 @@ public:
 
     Rectangle() : Geom() {};
 
-    Eigen::Vector3f get_p1() const {return p1;}
-    Eigen::Vector3f get_p2() const {return p2;}
-    Eigen::Vector3f get_p3() const {return p3;}
-    Eigen::Vector3f get_p4() const {return p4;}
-    Eigen::Vector3f get_n() const {return n;}
+    Eigen::Vector3f get_p1() const {return p1;};
+    Eigen::Vector3f get_p2() const {return p2;};
+    Eigen::Vector3f get_p3() const {return p3;};
+    Eigen::Vector3f get_p4() const {return p4;};
+    Eigen::Vector3f get_n() const {return n;};
     // all the additional getters for rec
 
     void set_p1(Eigen::Vector3f s) {p1 = s;}
@@ -134,6 +128,8 @@ public:
 
     float intersect() override;
     // intersect with rec
+
+    void test() override;
 };
 
 

@@ -2,11 +2,11 @@
 #define RAYTRACER_H
 
 // ===INCLUDE===
-#include "json.hpp"
-#include "Geometry.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "json.hpp"
+#include "Geometry.h"
 
 #include <vector>
 

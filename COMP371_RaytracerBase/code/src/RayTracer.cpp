@@ -20,7 +20,7 @@ void RayTracer::extract_data(){
                 Sphere *s = new Sphere();
 
                 s->set_radius(float(g["radius"]));
-                s->set_centre(Eigen::Vector3f(g["centre"][0], g["centre"][0], g["centre"][0]));
+                s->set_centre(Eigen::Vector3f(g["centre"][0], g["centre"][1], g["centre"][2]));
                 s->set_type(std::string(g["type"]));
 
                 this->geoms.push_back(s);
@@ -36,9 +36,7 @@ void RayTracer::test() {
     // just a quick test function that returns specific values so that i can make sure things are working correctly
 
     for (const auto& i : this->geoms) {
-        std::cout << i->get_type() << std::endl;
-        std::cout << i->get_centre() << std::endl;
-        std::cout << i->get_radius() << std::endl;
+        i->test();
     }
 
 };
