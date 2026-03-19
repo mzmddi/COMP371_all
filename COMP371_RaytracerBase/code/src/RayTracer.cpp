@@ -12,7 +12,7 @@ RayTracer::RayTracer(const nlohmann::json &input_j) : json_obj(input_j) {};
 
 void RayTracer::extract_data(){
 
-    if (this->json_obj.contains("geometry") && (this->json_obj.size() >= 1)) {
+    if (this->json_obj.contains("geometry") && (this->json_obj["geometry"].size() >= 1)) {
 
         for (const auto& g : this->json_obj["geometry"]) {
             Geom* geo = nullptr;
@@ -64,7 +64,13 @@ void RayTracer::extract_data(){
 
     } else {
         std::cout << "JSON file needs to have at least 1 geometry. Detected 0." << std::endl;
-    }
+    };
+
+    if (this->json_obj.contains("light") && (this->json_obj["light"].size() >= 1 )) {
+
+    } else {
+        std::cout << "JSON file needs to have at least 1 light. Detected 0." << std::endl;
+    };
 };
 
 void RayTracer::test() {
