@@ -136,8 +136,41 @@ void RayTracer::extract_data()
 
     if (this->json_obj.contains("output") && (this->json_obj["output"].size() >= 1))
     {
-        for (const auto &o : this->json_obj["o"])
+        for (const auto &o : this->json_obj["output"])
         {
+
+            // void set_output_filename(std::string s) { this->output_filename = s; };
+            // void set_width(int s) { this->width = s; };
+            // void set_height(int s) { this->height = s; };
+            // void set_fov(float s) { this->fov = s; };
+            // void set_centre(Eigen::Vector3f s) { this->centre = s; };
+            // void set_up(Eigen::Vector3f s) { this->up = s; };
+            // void set_lookat(Eigen::Vector3f s) { this->lookat = s; };
+            // void set_ai(Eigen::Vector3f s) { this->ai = s; };
+            // void set_bkc(Eigen::Vector3f s) { this->bkc = s; };
+            // void set_using_rayperpixel(bool s) { this->using_rayperpixel = s; };
+            // void set_raysperpixel(Eigen::VectorXf s) { this->raysperpixel = s; };
+            // void set_globalillum(bool s) { this->globalillum = s; };
+            // void set_antialiasing(bool s) { this->antialiasing = s; };
+            // void set_twosiderender(bool s) { this->twosiderender = s; };
+            // void set_maxbounces(int s) { this->maxbounces = s; };
+            // void set_probterminate(float s) { this->probterminate = s; };
+
+            Output *output = new Output();
+
+            // std::string output_filename;
+            // int width;
+            // int height;
+            // float fov;
+            // Eigen::Vector3f centre;
+            // Eigen::Vector3f up;
+            // Eigen::Vector3f lookat;
+            // Eigen::Vector3f ai;
+            // Eigen::Vector3f bkc;
+            // // all the mandatory members from the output
+
+            output->set_output_filename(std::string(o["filename"]));
+            
         };
     }
     else

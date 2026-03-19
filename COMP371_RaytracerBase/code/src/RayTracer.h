@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "Geometry.h"
 #include "Light.h"
+#include "Output.h"
 
 #include <vector>
 
@@ -18,22 +19,6 @@ class RayTracer
 
     const nlohmann::json json_obj;
     // variable holding the json object passed from main.cpp
-
-    std::string output_filename;
-    Eigen::Vector3f up;
-    Eigen::Vector3f lookat;
-    Eigen::Vector3f ai;
-    Eigen::Vector3f bkc;
-    Eigen::VectorXf raysperpixel;
-    int width;
-    int height;
-    float maxbounce;
-    float probterminate;
-    float fov;
-    bool globalillum;
-    bool antialiasing;
-    bool twosiderender;
-    // All of the variables extracted from the json not pertaining to geometry declared all at once
 
     std::vector<Geom *> geoms;
     std::vector<Light *> lights;
