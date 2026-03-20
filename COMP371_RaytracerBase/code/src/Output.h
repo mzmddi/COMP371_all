@@ -5,6 +5,8 @@
 #include <Eigen/Core>
 #include <iostream>
 
+#include "Camera.h"
+
 // ---CODE---
 
 class Output
@@ -98,7 +100,7 @@ public:
     void set_probterminate(float s) { this->probterminate = s; };
     // all the setters for every single class attribute
 
-    void test() {};
+    void test();
 };
 
 #endif

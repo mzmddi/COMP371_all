@@ -5,6 +5,7 @@
 #include "RayTracer.h"
 
 #include <iostream>
+#include <Eigen/Geometry>
 
 // ---CODE---
 
@@ -235,5 +236,85 @@ void RayTracer::run()
 {
 
     this->extract_data();
-    this->test();
+    // this->test();
+
+    int counter = 0;
+
+    for (auto output : this->outputs)
+    {
+        // we want to loop over each output from the json file so that we render one for each.
+
+        Eigen::Vector3f w_basis = (output->get_centre() - output->get_lookat()).normalized();
+        Eigen::Vector3f u_basis = output->get_up().cross(w_basis).normalized();
+        Eigen::Vector3f v_basis = w_basis.cross(u_basis).normalized();
+        // the 3 basis vectors needed
+
+        float camera_distance = 1.0f;
+        // let's just assume that camera distance is 1
+        // check other test json files later if there's a camera distance defined or something and adjust extract() and this variable
+
+        Eigen::Vector3f proj_screen_center = output->get_centre() - (camera_distance * w_basis);
+        // centre of the screen in viewport
+
+        float theta = output->get_fov() * M_PI / 180.0f;
+        // getting the angle from the fov
+
+        float vp_height = 2.0f * tan((output->get_fov() * M_PI / 180.0f) / 2.0f) * camera_distance;
+        float aspect_ratio = (float)output->get_width() / (float)output->get_height();
+        float vp_width = aspect_ratio * vp_height;
+        // get the vp width and height
+
+        Eigen::Vector3f proj_width = u_basis * vp_width;
+        Eigen::Vector3f proj_height = v_basis * vp_height;
+        // now i have the projection width and height
+
+        Eigen::Vector3f top_left = proj_screen_center - (proj_width / 2.0f) + (proj_height / 2.0f);
+        // defining the top left pixel that we will start at
+
+        Eigen::Vector3f du = proj_width / (float)output->get_width();
+        Eigen::Vector3f dv = proj_height / (float)output->get_height();
+        // the steps we take when we move on from pixel to pixel
+        // du -> along u basis
+        // dv -> along v basis
+
+        const int x = output->get_width();
+        const int y = output->get_height();
+        // im gonna set the screen pixel size to a local variable so that for the loop, it doesnt call the variable every singel time
+
+        std::cout << "w_basis: " << w_basis.transpose() << std::endl;
+        std::cout << "u_basis: " << u_basis.transpose() << std::endl;
+        std::cout << "v_basis: " << v_basis.transpose() << std::endl;
+        std::cout << "proj_width: " << proj_width.transpose() << std::endl;
+        std::cout << "proj_height: " << proj_height.transpose() << std::endl;
+        std::cout << "du: " << du.transpose() << std::endl;
+        std::cout << "dv: " << dv.transpose() << std::endl;
+        std::cout << "top_left: " << top_left.transpose() << std::endl;
+
+        for (int j = 0; j < y; j++)
+        {
+            for (int i = 0; i < x; i++)
+            {
+                // main loop for raytracing
+                // loops over j then inside over i because
+                // we want it to loop row by row which is counterintuitively looping over the height
+
+                Eigen::Vector3f current_pix = top_left + (i + 0.5f) * du - (j + 0.5f) * dv;
+                // moving from top left, so each x moves right and each y moves down one row
+
+                // Ray *r = Ray();
+                // generating a new ray;
+
+                // r->set_o();
+                // r->set_d();
+                // set the origin + direction of the newly created ray
+
+                counter++;
+            };
+        };
+
+        // del(output);
+        // once we are done with this output, we want to destroy the memory of the pointer
+        // this is done because output was defined with new, so its on the heap, not on a stack
+    }; //
+    std::cout << "Counter of pixels: " << counter << std::endl;
 };
