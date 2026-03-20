@@ -5,6 +5,9 @@
 
 #include <Eigen/Core>
 
+#include "Ray.h"
+#include "HitRecord.h"
+
 // ---CODE---
 
 class Geom
@@ -62,7 +65,7 @@ public:
     void set_transform(Eigen::Matrix4f s) { transform = s; };
     // all of the setters defined and implemented
 
-    virtual float intersect() = 0;
+    virtual bool intersect(const Ray &r, float &t_min, float &closest_t, HitRecord &hit) = 0;
     virtual void test() = 0;
     // virtual methods that ill implement in the child classes
 
@@ -88,7 +91,7 @@ public:
     void set_centre(Eigen::Vector3f s) { centre = s; }
     // additional setters for sphere
 
-    float intersect() override;
+    bool intersect(const Ray &r, float &t_min, float &closest_t, HitRecord &hit) override;
     // intersection for sphere specifically
 
     void test() override;
@@ -125,7 +128,7 @@ public:
     void set_n(Eigen::Vector3f s) { this->n = s; }
     // additional setters for rec
 
-    float intersect() override;
+    bool intersect(const Ray &r, float &t_min, float &closest_t, HitRecord &hit) override;
     // intersect with rec
 
     void test() override;

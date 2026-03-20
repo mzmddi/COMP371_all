@@ -3,6 +3,8 @@
 // ---INCLUDE---
 
 #include "RayTracer.h"
+#include "Ray.h"
+#include "HitRecord.h"
 
 #include <iostream>
 #include <Eigen/Geometry>
@@ -281,14 +283,14 @@ void RayTracer::run()
         const int y = output->get_height();
         // im gonna set the screen pixel size to a local variable so that for the loop, it doesnt call the variable every singel time
 
-        std::cout << "w_basis: " << w_basis.transpose() << std::endl;
-        std::cout << "u_basis: " << u_basis.transpose() << std::endl;
-        std::cout << "v_basis: " << v_basis.transpose() << std::endl;
-        std::cout << "proj_width: " << proj_width.transpose() << std::endl;
-        std::cout << "proj_height: " << proj_height.transpose() << std::endl;
-        std::cout << "du: " << du.transpose() << std::endl;
-        std::cout << "dv: " << dv.transpose() << std::endl;
-        std::cout << "top_left: " << top_left.transpose() << std::endl;
+        // std::cout << "w_basis: " << w_basis.transpose() << std::endl;
+        // std::cout << "u_basis: " << u_basis.transpose() << std::endl;
+        // std::cout << "v_basis: " << v_basis.transpose() << std::endl;
+        // std::cout << "proj_width: " << proj_width.transpose() << std::endl;
+        // std::cout << "proj_height: " << proj_height.transpose() << std::endl;
+        // std::cout << "du: " << du.transpose() << std::endl;
+        // std::cout << "dv: " << dv.transpose() << std::endl;
+        // std::cout << "top_left: " << top_left.transpose() << std::endl;
 
         for (int j = 0; j < y; j++)
         {
@@ -296,17 +298,49 @@ void RayTracer::run()
             {
                 // main loop for raytracing
                 // loops over j then inside over i because
-                // we want it to loop row by row which is counterintuitively looping over the height
+                // we want it to loop row by row which is counter intuitively looping over the height
 
                 Eigen::Vector3f current_pix = top_left + (i + 0.5f) * du - (j + 0.5f) * dv;
                 // moving from top left, so each x moves right and each y moves down one row
 
-                // Ray *r = Ray();
+                Ray r = Ray();
                 // generating a new ray;
 
-                // r->set_o();
-                // r->set_d();
+                r.set_o(output->get_centre());
+                r.set_d((current_pix - output->get_centre()).normalized());
                 // set the origin + direction of the newly created ray
+
+                // if (counter % 670 == 0)
+                // {
+                //     std::cout << "Ray at counter " << counter << " -> origin: " << r.get_o().transpose() << "\tdirection: " << r.get_d().transpose() << std::endl;
+                // };
+
+                bool did_it_hit = false;
+                // setting up a boolean to see if it is going to hit anything, might save time later not sure tho
+
+                float closest_hit = std::numeric_limits<float>::max();
+                HitRecord closest_hitrecord = HitRecord();
+                // setting up the closest hit first as inf so that we have a value that makes sense
+
+                float t_min = 0.0001f;
+                // setting up a variable so i dont have to rewrite the same number more than once for nothing
+
+                for (auto &geom : this->geoms)
+                {
+                    // this is when i loop through every object to see if my ray hits any of them
+
+                    HitRecord hit = HitRecord();
+                    // temp hit record for this specific ray to geom ray intersection
+
+                    if (geom->intersect(r, t_min, closest_hit, hit))
+                    {
+                        did_it_hit = true;
+                        closest_hit = hit.get_t();
+                        closest_hitrecord = hit;
+                    };
+                };
+
+                HitRecord hit = HitRecord();
 
                 counter++;
             };

@@ -5,8 +5,6 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include "Camera.h"
-
 // ---CODE---
 
 class Output
