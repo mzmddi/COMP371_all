@@ -46,6 +46,7 @@ void RayTracer::extract_data()
 
                 Eigen::Vector3f calculated_normal = (r->get_p2() - r->get_p1()).cross(r->get_p4() - r->get_p1()).normalized();
                 r->set_n(calculated_normal);
+
                 geo = r;
             }
             else
@@ -360,6 +361,20 @@ void RayTracer::run()
                 {
                     // did_it_hit = false;
                     // immediately putting it to false, ready for the next loop
+
+                    for (auto &light : this->lights)
+                    {
+                        // looping through all the lights defined in the json
+
+                        Eigen::Vector3f ambient = (closest_hitrecord.get_ka() * closest_hitrecord.get_ac()).cwiseProduct(output->get_ai());
+                        final_pixel_color = ambient;
+                        // we set up the ambient color first
+
+                        if (light->get_type() == "area")
+                        {
+                            continue;
+                        };
+                    };
 
                     final_pixel_color = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
                 }

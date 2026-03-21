@@ -59,7 +59,14 @@ bool Sphere::intersect(const Ray &r, float &t_min, float &closest_t, HitRecord &
     hit.set_hit_coordinate(r.where_at(closest_root));
 
     Eigen::Vector3f out_normal = ((hit.get_hit_coordinate() - this->get_centre()) / this->get_radius()).normalized();
-    hit.set_snormal(out_normal);
+    hit.set_n(out_normal);
+    hit.set_ac(this->get_ac());
+    hit.set_dc(this->get_dc());
+    hit.set_sc(this->get_sc());
+    hit.set_ka(this->get_ka());
+    hit.set_kd(this->get_kd());
+    hit.set_ks(this->get_ks());
+    hit.set_pc(this->get_pc());
     // calculating the out pointing surface normal of the point where the ray intersects
 
     return true;
@@ -153,6 +160,14 @@ bool Rectangle::intersect(const Ray &r, float &t_min, float &closest_t, HitRecor
 
     hit.set_t(t);
     hit.set_hit_coordinate(hit_point);
+    hit.set_ac(this->get_ac());
+    hit.set_dc(this->get_dc());
+    hit.set_sc(this->get_sc());
+    hit.set_ka(this->get_ka());
+    hit.set_kd(this->get_kd());
+    hit.set_ks(this->get_ks());
+    hit.set_pc(this->get_pc());
+    hit.set_n(this->get_n());
     // record the values once we hit this part since it is inside the rectangle
 
     return true;
