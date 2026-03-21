@@ -1,13 +1,13 @@
 
 
 // ---INCLUDE---
+#include <iostream>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #include "RayTracer.h"
 #include "Ray.h"
 #include "HitRecord.h"
-
-#include <iostream>
-#include <Eigen/Geometry>
 
 // ---CODE---
 
@@ -246,6 +246,9 @@ void RayTracer::run()
     {
         // we want to loop over each output from the json file so that we render one for each.
 
+        std::vector<double> image_buffer(this->get_width() * this->get_height() * 3);
+        // immediately starting with the image buffer with allocating exactly how much memory i need for this specific output object
+
         Eigen::Vector3f w_basis = (output->get_centre() - output->get_lookat()).normalized();
         Eigen::Vector3f u_basis = output->get_up().cross(w_basis).normalized();
         Eigen::Vector3f v_basis = w_basis.cross(u_basis).normalized();
@@ -292,6 +295,16 @@ void RayTracer::run()
         // std::cout << "dv: " << dv.transpose() << std::endl;
         // std::cout << "top_left: " << top_left.transpose() << std::endl;
 
+        HitRecord hit = HitRecord();
+        Ray r = Ray();
+        // generating a ray and a temporary hit record
+        // this is done outside of all the loops because these are generally just short term holding values
+        // they wont hold any values outside of the loops
+        // so logically, it's better to create a space for them once in the stack for the output loop method
+        // and then having the code reassign values to the same memory space once the data is no longer useful
+        // this way, we are shortcutting the creation of both object at each geometry loop, which is inside the i,j loop
+        // in total, the code would have created a ray and a hit record i*j*geoetries.size(), which is in the 100,000s
+
         for (int j = 0; j < y; j++)
         {
             for (int i = 0; i < x; i++)
@@ -302,9 +315,6 @@ void RayTracer::run()
 
                 Eigen::Vector3f current_pix = top_left + (i + 0.5f) * du - (j + 0.5f) * dv;
                 // moving from top left, so each x moves right and each y moves down one row
-
-                Ray r = Ray();
-                // generating a new ray;
 
                 r.set_o(output->get_centre());
                 r.set_d((current_pix - output->get_centre()).normalized());
@@ -329,9 +339,6 @@ void RayTracer::run()
                 {
                     // this is when i loop through every object to see if my ray hits any of them
 
-                    HitRecord hit = HitRecord();
-                    // temp hit record for this specific ray to geom ray intersection
-
                     if (geom->intersect(r, t_min, closest_hit, hit))
                     {
                         did_it_hit = true;
@@ -340,7 +347,23 @@ void RayTracer::run()
                     };
                 };
 
-                HitRecord hit = HitRecord();
+                if (did_it_hit)
+                {
+                    // did_it_hit = false;
+                    // immediately putting it to false, ready for the next loop
+
+                    final_pixel_color = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
+                    // test color
+                }
+                else
+                {
+                    final_pixel_color = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
+                    // test color
+                };
+
+                // use did_it_hit bool to see if hit
+                // if hit -> color of the geometry recorded in hitRecord
+                // if not hit -> bkc
 
                 counter++;
             };

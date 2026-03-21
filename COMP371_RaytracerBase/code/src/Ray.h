@@ -21,6 +21,6 @@ public:
     void set_o(Eigen::Vector3f s) { this->o = s; };
     void set_d(Eigen::Vector3f s) { this->d = s; };
 
-    Eigen::Vector3f where_at(float t);
+    Eigen::Vector3f where_at(float t) const;
 };
 #endif

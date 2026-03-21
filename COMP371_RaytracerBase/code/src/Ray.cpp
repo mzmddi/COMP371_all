@@ -6,7 +6,7 @@
 
 // ---CODE---
 
-Eigen::Vector3f Ray::where_at(float t)
+Eigen::Vector3f Ray::where_at(float t) const
 {
     return (this->get_o() + (t * this->get_d()));
 };
