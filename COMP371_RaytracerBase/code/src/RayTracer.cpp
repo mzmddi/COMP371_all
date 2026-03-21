@@ -366,40 +366,80 @@ void RayTracer::run()
                     {
                         // looping through all the lights defined in the json
 
-                        Eigen::Vector3f ambient = (closest_hitrecord.get_ka() * closest_hitrecord.get_ac()).cwiseProduct(output->get_ai());
-                        final_pixel_color = ambient;
-                        // we set up the ambient color first
-
                         if (light->get_type() == "area")
                         {
                             continue;
                         };
-                    };
+                        // since assignment 4 does not include area lights, then we can skip the area type of lights with the if statement above
 
-                    final_pixel_color = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-                }
+                        // MOVING FORWRAD, THE CODE IS JUST FOR POINT LIGHT SINCE AREA LIGHT IS NOT CONSIDERED FOR ASS4
 
-                img_buffer[pixel_index] = final_pixel_color[0];
-                img_buffer[pixel_index + 1] = final_pixel_color[1];
-                img_buffer[pixel_index + 2] = final_pixel_color[2];
+                        final_pixel_color = light->calculate_light(closest_hitrecord, output->get_centre(), output->get_ai(), this->geoms, r);
 
-                // use did_it_hit bool to see if hit
-                // if hit -> color of the geometry recorded in hitRecord
-                // if not hit -> bkc
+                        //         Eigen::Vector3f dl = (light->get_centre() - closest_hitrecord.get_hit_coordinate()).normalized();
+                        //     // setting light direction
 
-                counter++;
+                        //     float distance_to_light = (light->get_centre() - closest_hitrecord.get_hit_coordinate()).norm();
+                        //     // getting the distance of the light source to the point
+
+                        //     r.set_o(closest_hitrecord.get_hit_coordinate());
+                        //     r.set_d(dl);
+                        //     // using the ray as the shadow ray
+
+                        //     bool is_occluded = false;
+                        //     // we're going to use this as a check if the point is occluded or not
+
+                        //     for (auto &geom : this->geoms)
+                        //     {
+                        //         // looping through the geometries again to check if the geometry is blocking the light
+
+                        //         float t_shadow;
+                        //         // the t of the ray for the shadow ray
+
+                        //         if (geom->intersect(r, t_min, distance_to_light, closest_hitrecord))
+                        //         {
+                        //             is_occluded = true;
+                        //             break;
+                        //             // we found that the point is blocked by a geometry from the light
+                        //         };
+                        //     };
+
+                        //     if (!is_occluded)
+                        //     {
+                        //         // only if is_occluded is false, if it is blocked, we only care about ambient light
+
+                        //         Eigen::Vector3f phong_light = light->calculate_light(closest_hitrecord, dl, output->get_centre());
+                        //         // getting the diffuse and specular light from the method calculate light inside the light class
+
+                        //         final_pixel_color += phong_light;
+                        //         // now that i have both the final pixek ius just the diffuse and the specular added (light is additive apparently)
+                        //     };
+                        // };
+
+                        // final_pixel_color = final_pixel_color.cwiseMin(1.0f).cwiseMax(0.0f);
+                    }
+
+                    img_buffer[pixel_index] = final_pixel_color[0];
+                    img_buffer[pixel_index + 1] = final_pixel_color[1];
+                    img_buffer[pixel_index + 2] = final_pixel_color[2];
+
+                    // use did_it_hit bool to see if hit
+                    // if hit -> color of the geometry recorded in hitRecord
+                    // if not hit -> bkc
+
+                    counter++;
+                };
             };
+
+            save_ppm(output->get_output_filename(), img_buffer, output->get_width(), output->get_height());
+            // saving this specific output as a ppm file
+            // since there's a possibility there's more than out output object in the json (the teacher said minimum one, not any maximum), there might be more than one output to render, and so more than one image produced at the end
+
+            delete output;
+            output = nullptr;
+            // once we are done with this output, we want to destroy the memory of the pointer
+            // this is done because output was defined with new, so its on the heap, not on a stack
         };
-
-        save_ppm(output->get_output_filename(), img_buffer, output->get_width(), output->get_height());
-        // saving this specific output as a ppm file
-        // since there's a possibility there's more than out output object in the json (the teacher said minimum one, not any maximum), there might be more than one output to render, and so more than one image produced at the end
-
-        delete output;
-        output = nullptr;
-        // once we are done with this output, we want to destroy the memory of the pointer
-        // this is done because output was defined with new, so its on the heap, not on a stack
+        this->outputs.clear();
+        std::cout << "Counter of pixels: " << counter << std::endl;
     };
-    this->outputs.clear();
-    std::cout << "Counter of pixels: " << counter << std::endl;
-};
