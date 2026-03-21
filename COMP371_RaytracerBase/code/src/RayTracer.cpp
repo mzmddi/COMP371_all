@@ -9,6 +9,7 @@
 #include "Ray.h"
 #include "HitRecord.h"
 #include "../external/simpleppm.h"
+#include "Light.h"
 
 // ---CODE---
 
