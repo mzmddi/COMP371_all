@@ -352,7 +352,7 @@ void RayTracer::run()
                 // the index that this pixel is at specifically
                 // * 3 since the img buffer is single rgb value (flat basically)
 
-                Eigen::Vector3f final_pixel_color = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
+                Eigen::Vector3f final_pixel_color = output->get_bkc();
                 // by default, im setting the final pixel color first, then if there's a hit, then we'll do the calc
 
                 if (did_it_hit)
