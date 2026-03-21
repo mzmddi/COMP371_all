@@ -8,6 +8,7 @@
 #include "RayTracer.h"
 #include "Ray.h"
 #include "HitRecord.h"
+#include "external/simpleppm.h"
 
 // ---CODE---
 
@@ -242,11 +243,11 @@ void RayTracer::run()
 
     int counter = 0;
 
-    for (auto output : this->outputs)
+    for (auto &output : this->outputs)
     {
         // we want to loop over each output from the json file so that we render one for each.
 
-        std::vector<double> image_buffer(this->get_width() * this->get_height() * 3);
+        std::vector<double> img_buffer(this->get_width() * this->get_height() * 3);
         // immediately starting with the image buffer with allocating exactly how much memory i need for this specific output object
 
         Eigen::Vector3f w_basis = (output->get_centre() - output->get_lookat()).normalized();
@@ -347,19 +348,24 @@ void RayTracer::run()
                     };
                 };
 
+                pixel_index = ((j * this->get_width()) + i) * 3;
+                // the index that this pixel is at specifically
+                // * 3 since the img buffer is single rgb value (flat basically)
+
+                final_pixel_color = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
+                // by default, im setting the final pixel color first, then if there's a hit, then we'll do the calc
+
                 if (did_it_hit)
                 {
                     // did_it_hit = false;
                     // immediately putting it to false, ready for the next loop
 
                     final_pixel_color = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-                    // test color
                 }
-                else
-                {
-                    final_pixel_color = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
-                    // test color
-                };
+
+                img_buffer[pixel_index] = final_pixel_color[0];
+                img_buffer[pixel_index + 1] = final_pixel_color[1];
+                img_buffer[pixel_index + 2] = final_pixel_color[2];
 
                 // use did_it_hit bool to see if hit
                 // if hit -> color of the geometry recorded in hitRecord
@@ -369,9 +375,15 @@ void RayTracer::run()
             };
         };
 
-        // del(output);
+        save_ppm(this->get_output_filename(), img_buffer, this->get_width(), this->get_height());
+        // saving this specific output as a ppm file
+        // since there's a possibility there's more than out output object in the json (the teacher said minimum one, not any maximum), there might be more than one output to render, and so more than one image produced at the end
+
+        delete output;
+        output = nullptr;
         // once we are done with this output, we want to destroy the memory of the pointer
         // this is done because output was defined with new, so its on the heap, not on a stack
-    }; //
+    };
+    this->outputs.clear();
     std::cout << "Counter of pixels: " << counter << std::endl;
 };
