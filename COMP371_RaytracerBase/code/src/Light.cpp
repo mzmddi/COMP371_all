@@ -16,7 +16,7 @@ void AreaLight::test()
     std::cout << "Area Points 1->4 : [" << this->get_p1().transpose() << "], [" << this->get_p2().transpose() << "], [" << this->get_p3().transpose() << "], [" << this->get_p4().transpose() << "]" << std::endl;
 };
 
-Eigen::Vector3f AreaLight::calculate_light(const HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms, Ray &r) { return Eigen::Vector3f(0.0f, 0.0f, 0.0f); };
+Eigen::Vector3f AreaLight::calculate_light(HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms) { return Eigen::Vector3f(0.0f, 0.0f, 0.0f); };
 
 void PointLight::test()
 {
@@ -24,11 +24,11 @@ void PointLight::test()
     std::cout << "Centre: " << this->get_centre().transpose() << std::endl;
 };
 
-Eigen::Vector3f PointLight::calculate_light(const HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms, Ray &r)
+Eigen::Vector3f PointLight::calculate_light(HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms)
 {
     float t_min = 0.000001f;
 
-    Eigen::Vector3f ambient = (closest_hitrecord.get_ka() * closest_hitrecord.get_ac()).cwiseProduct(output_ai());
+    Eigen::Vector3f ambient = (closest_hitrecord.get_ka() * closest_hitrecord.get_ac()).cwiseProduct(output_ai);
     Eigen::Vector3f pixel_color = ambient;
     // we set up the ambient color first
 
@@ -37,6 +37,8 @@ Eigen::Vector3f PointLight::calculate_light(const HitRecord &closest_hitrecord, 
 
     float distance_to_light = (this->get_centre() - closest_hitrecord.get_hit_coordinate()).norm();
     // getting the distance of the light source to the point
+
+    Ray r = Ray();
 
     r.set_o(closest_hitrecord.get_hit_coordinate());
     r.set_d(dl);

@@ -3,6 +3,7 @@
 
 // ---INCLUDE---
 #include <Eigen/Core>
+#include <vector>
 
 #include "HitRecord.h"
 #include "Geometry.h"
@@ -53,7 +54,7 @@ public:
 
     // const Eigen::Vector3f& hit_point, const Eigen::Vector3f& normal, const Eigen::Vector3f& camera_position
 
-    virtual Eigen::Vector3f calculate_light(const HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms, Ray &r) = 0;
+    virtual Eigen::Vector3f calculate_light(HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms) = 0;
 
     virtual ~Light() = default;
     // destructor
@@ -83,7 +84,7 @@ public:
     void set_p4(Eigen::Vector3f s) { this->p4 = s; };
     // setters for the area light
 
-    Eigen::Vector3f calculate_light(const HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms, Ray &r);
+    Eigen::Vector3f calculate_light(HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms);
     void test() override;
 };
 
@@ -99,7 +100,7 @@ public:
     // getter and setter for this class
     // since it's just one mandatory value unqiue to point light, it's one getter/setter
 
-    Eigen::Vector3f calculate_light(const HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms, Ray &r) override;
+    Eigen::Vector3f calculate_light(HitRecord &closest_hitrecord, const Eigen::Vector3f &light_centre, const Eigen::Vector3f output_ai, const std::vector<Geom *> &geoms) override;
     void test() override;
 };
 

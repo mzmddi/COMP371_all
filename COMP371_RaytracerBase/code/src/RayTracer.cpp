@@ -354,7 +354,7 @@ void RayTracer::run()
                 // the index that this pixel is at specifically
                 // * 3 since the img buffer is single rgb value (flat basically)
 
-                Eigen::Vector3f final_pixel_color = output->get_bkc();
+                Eigen::Vector3f final_pixel_color(0.0f, 1.0f, 0.0f);
                 // by default, im setting the final pixel color first, then if there's a hit, then we'll do the calc
 
                 if (did_it_hit)
@@ -374,7 +374,7 @@ void RayTracer::run()
 
                         // MOVING FORWRAD, THE CODE IS JUST FOR POINT LIGHT SINCE AREA LIGHT IS NOT CONSIDERED FOR ASS4
 
-                        final_pixel_color = light->calculate_light(closest_hitrecord, output->get_centre(), output->get_ai(), this->geoms, r);
+                        final_pixel_color = light->calculate_light(closest_hitrecord, output->get_centre(), output->get_ai(), this->geoms);
 
                         //         Eigen::Vector3f dl = (light->get_centre() - closest_hitrecord.get_hit_coordinate()).normalized();
                         //     // setting light direction
@@ -443,3 +443,4 @@ void RayTracer::run()
         this->outputs.clear();
         std::cout << "Counter of pixels: " << counter << std::endl;
     };
+};
